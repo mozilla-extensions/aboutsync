@@ -212,6 +212,25 @@ let Providers = (function() {
           return url;
         }
         let u = new URL(url);
+        if (u.protocol == "about:") {
+          // about: urls are special and don't have functioning path/querystrings
+          // First split the about page from the query/hash:
+          let aboutPage = u.pathname.match(/^[^?#\/]*/)[0];
+          let aboutTrailing = u.pathname.substring(aboutPage.length).split("#");
+          // The first string in the array is going to be the search query, if any.
+          // Manually parse as a URLSearchParams, anonymize the params, and replace
+          // the string back into the array
+          if (aboutTrailing[0].length > 0) {
+            let aboutParams = new URLSearchParams(aboutTrailing[0].replace(/^\?/, ''));
+            anonymizeURLSearchParams(aboutParams);
+            // We stripped the initial "?" - put it back:
+            aboutTrailing[0] = "?" + aboutParams.toString();
+          }
+          // call anonymizeString on all the other bits of the array and concat
+          // back into a string:
+          aboutTrailing = aboutTrailing[0] + aboutTrailing.slice(1).map(anonymizeString).join("#");
+          return u.protocol + aboutPage + aboutTrailing;
+        }
         anonymizeProperties(u, "host username password");
         u.pathname = u.pathname.split("/").map(anonymizeString).join("/");
 
@@ -219,12 +238,7 @@ let Providers = (function() {
           u.hash = anonymizeString(u.hash.slice(1));
         }
 
-        // deleting items while iterating confuses things, so fetch all
-        // entries as an array.
-        for (let [name, value] of [...u.searchParams.entries()]) {
-          u.searchParams.delete(name);
-          u.searchParams.set(anonymizeString(name), anonymizeString(value));
-        }
+        anonymizeURLSearchParams(u.searchParams);
         return u.toString();
       }
 
@@ -234,6 +248,16 @@ let Providers = (function() {
           if (ob[propName]) {
             ob[propName] = anonymizeURL(ob[propName]);
           }
+        }
+      }
+      
+      // Anonymize a URL search string object
+      function anonymizeURLSearchParams(searchParams) {
+        // deleting items while iterating confuses things, so fetch all
+        // entries as an array.
+        for (let [name, value] of [...searchParams.entries()]) {
+          searchParams.delete(name);
+          searchParams.set(anonymizeString(name), anonymizeString(value));
         }
       }
 
