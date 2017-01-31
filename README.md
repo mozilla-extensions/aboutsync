@@ -15,14 +15,15 @@ are welcome!
 The easiest way to develop/debug this is:
 
 * Clone the git repo locally.
-* In about:debugging, Load the extension by selecting the `chrome.manifest` file
-* Open chrome://aboutsync/content/index.html (or use the new "About Sync" entry
-  created in the "Tools" menu)
-* When using the addon this way, you can make changes to the HTML/CSS/JS and
-  press the refrsh button in the `about:debugging` it will be picked up automatically.
+* In about:debugging, Load the extension by selecting the
+  `chrome.manifest` file
+* Open chrome://aboutsync/content/index.html (or use the new "About
+  Sync" entry created in the "Tools" menu)
+* When using the addon this way, you can make changes to the
+  HTML/CSS/JS and press the refresh button in the `about:debugging`
+  panel. It will be picked up automatically.
 
 Other notes:
 * To see verbose debug messages from bootstrap.js, create a boolean preference
   "extensions.aboutsync.verbose" to true - message will be sent to the browser
   console. Note that console.log etc can be used in the "data" JS.
-
