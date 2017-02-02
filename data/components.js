@@ -382,7 +382,7 @@ const collectionComponentBuilders = {
 
     let clientTree = yield provider.promiseBookmarksTree();
     let validator = new BookmarkValidator();
-    let validationResults = validator.compareServerWithClient(serverRecords, clientTree);
+    let validationResults = yield Promise.resolve(validator.compareServerWithClient(serverRecords, clientTree));
     let probs = validationResults.problemData;
 
     // Turn the list of records into a map keyed by ID.
