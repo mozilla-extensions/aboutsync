@@ -235,3 +235,37 @@ html {
 .table-inspector-number-cell {
   color: green;
 }
+
+.sql-editor textarea {
+  display: block;
+  margin: 5px 0px;
+  width: 100%;
+  font-size: 16px;
+  border-radius: 3px;
+  border: 1px solid rgb(0, 0, 0, 0.3);
+  padding: 5px;
+}
+
+.sql-error {
+  background: rgb(255, 128, 128);
+  border: 1px solid red;
+  margin: 5px;
+  padding: 5px;
+  color: rgb(128, 0, 0);
+  position: relative;
+}
+
+.sql-error .close-error {
+  position: absolute;
+  right: 5px;
+  background: 0;
+  border: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: rgb(128, 0, 0);
+  cursor: pointer;
+}
+
+.sql-error p {
+  margin: 0;
+}

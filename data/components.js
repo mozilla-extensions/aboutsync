@@ -4,6 +4,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/FxAccounts.jsm");
 Cu.import("resource://services-sync/main.js");
 Cu.import("resource://gre/modules/Task.jsm");
+Cu.import("resource://gre/modules/PlacesUtils.jsm");
 
 const weaveService = Cc["@mozilla.org/weave/service;1"]
                      .getService(Ci.nsISupports)
@@ -37,14 +38,26 @@ function createObjectInspector(name, data, expandLevel = 1) {
   return React.createElement(ReactInspector.ObjectInspector, {name, data, expandLevel: expandLevel });
 }
 
+function valueLookupTable(o) {
+  return new Map(Object.entries(o).map(([k, v]) => [v, k]));
+}
+
 function aboutSyncCellFormatter(cellValue, isExpanded, columnName, owningRow) {
   // It would be nice if we hid form value too, but that would require threading
   // a lot of state through.
   if (!isExpanded && columnName === "password") {
     cellValue = "**** hidden unless expanded ****";
   }
-  return AboutSyncTableInspector.defaultProps.cellFormatter(
+  let defaultFormat = AboutSyncTableInspector.defaultProps.cellFormatter(
     cellValue, isExpanded, columnName, owningRow);
+  if (columnName === "syncStatus") {
+    let descs = valueLookupTable(PlacesUtils.bookmarks.SYNC_STATUS);
+    if (descs.has(+cellValue)) {
+      return React.DOM.span(null, defaultFormat, ` (${descs.get(+cellValue)})`);
+    }
+  }
+
+  return defaultFormat;
 }
 
 function createTableInspector(data) {
@@ -52,6 +65,42 @@ function createTableInspector(data) {
     data,
     cellFormatter: aboutSyncCellFormatter
   });
+}
+
+function getSqlColumnNames(sql) {
+  // No way to get column names from the async api :(... Bug 1326565.
+  let stmt;
+  try {
+    const db = PlacesUtils.history.QueryInterface(Ci.nsPIPlacesDatabase).DBConnection;
+    stmt = db.createStatement(sql);
+    const columns = [];
+    for (let i = 0; i < stmt.columnCount; ++i) {
+      columns.push(stmt.getColumnName(i));
+    }
+    return columns;
+  } finally {
+    if (stmt) {
+      // Do we need to call both?
+      stmt.reset();
+      stmt.finalize();
+    }
+  }
+}
+
+function promiseSql(sql, params = {}) {
+  let columnNames = getSqlColumnNames(sql);
+  return PlacesUtils.withConnectionWrapper(
+    "AboutSync: promiseSql", Task.async(function*(db) {
+    let rows = yield db.executeCached(sql, params);
+    let resultRows = rows.map(row => {
+      let resultRow = {};
+      for (let columnName of columnNames) {
+        resultRow[columnName] = row.getResultByName(columnName);
+      }
+      return resultRow;
+    });
+    return resultRows; // Return column names too?
+  }));
 }
 
 // A tab-smart "anchor"
@@ -236,6 +285,83 @@ class CollValidationResultDisplay extends React.Component {
   }
 }
 
+const sqlQueryPref = "extensions.aboutsync.lastQuery";
+
+function getLastQuery() {
+  try {
+    return Services.prefs.getCharPref(sqlQueryPref);
+  } catch (e) {
+    return "select * from moz_bookmarks\nlimit 100";
+  }
+}
+
+function updateLastQuery(query) {
+  try {
+    return Services.prefs.setCharPref(sqlQueryPref, query);
+  } catch (e) {
+    console.warn("Failed to update last query", e);
+  }
+}
+
+class PlacesSqlView extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      text: getLastQuery(),
+      rows: [],
+      error: null
+    };
+  }
+
+  executeSql() {
+    promiseSql(this.state.text).then(rows => {
+      this.setState(Object.assign(this.state, { rows, error: undefined }));
+      updateLastQuery(this.state.text);
+    }).catch(error => {
+      this.setState(Object.assign(this.state, { error }));
+    })
+  }
+
+  renderErrorMsg(error) {
+    if (error instanceof Ci.mozIStorageError) {
+      let codeToName = valueLookupTable(Ci.mozIStorageError);
+      return `mozIStorageError(${error.result}: ${codeToName.get(error.result)}): ${error.message}`;
+    }
+    // Be smarter here?
+    return String(error);
+  }
+
+  closeError() {
+    this.setState(Object.assign(this.state, { error: null }));
+  }
+
+  render() {
+    const { div, button, p, textarea } = React.DOM;
+    return (
+      div({ className: "sql-view" },
+        div({ className: "sql-editor" },
+          textarea({
+            value: this.state.text,
+            // @@TODO: use contenteditable <pre> or something a bit nicer?
+            onChange: e => {
+              this.setState(Object.assign(this.state, { text: e.target.value }));
+            }
+          }),
+          button({ className: "execute-sql", onClick: e => this.executeSql() },
+            "Execute SQL")
+        ),
+        this.state.error && (
+          div({ className: "sql-error" },
+            button({ className: "close-error", onClick: e => this.closeError(), title: "Close" }, "X"),
+            p(null, "Error running SQL: ", this.renderErrorMsg(this.state.error))
+          )
+        ),
+        createTableInspector(this.state.rows)
+      )
+    );
+  }
+}
+
 // takes an array of objects who have no real properties but have a bunch of
 // getters on their prototypes, and returns an array of new objects that contain
 // the properties directly. Used for XPCOM stuff. prioritizedKeys are keys
@@ -384,6 +510,21 @@ const collectionComponentBuilders = {
     let validator = new BookmarkValidator();
     let validationResults = yield Promise.resolve(validator.compareServerWithClient(serverRecords, clientTree));
     let probs = validationResults.problemData;
+
+    // If we're running locally, add syncChangeCounter and syncStatus to the
+    // client records so that it shows up in various tables.
+    if (ProviderState.useLocalProvider) {
+      let rows = yield promiseSql("select syncChangeCounter, syncStatus, guid from moz_bookmarks");
+      let lookup = new Map(rows.map(row => [row.guid, row]));
+      for (let bmark of validationResults.clientRecords) {
+        let item = lookup.get(bmark.guid);
+        if (!item) {
+          continue;
+        }
+        bmark.syncChangeCounter = item.syncChangeCounter;
+        bmark.syncStatus = item.syncStatus;
+      }
+    }
 
     // Turn the list of records into a map keyed by ID.
     let serverMap = new Map(serverRecords.map(item => [item.id, item]));
@@ -575,6 +716,7 @@ const collectionComponentBuilders = {
       "Raw validation results": [createObjectInspector("Validation", validationResults)],
       "Client Records": [createTableInspector(validationResults.clientRecords)],
       "Client Tree": [createObjectInspector("root", rawTree)],
+      "SQL": [React.createElement(PlacesSqlView)],
     };
   }),
 
