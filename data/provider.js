@@ -135,6 +135,10 @@ let Providers = (function() {
         }
         // Do the actual fetch after an event spin.
         this._collections[info.name] = Promise.resolve().then(() => {
+          if (typeof collection.getBatched == "function") {
+            // Firefox 52+ supports download batching.
+            return collection.getBatched();
+          }
           return collection.get();
         }).then(raw => {
           // turn it into a vanilla object.
