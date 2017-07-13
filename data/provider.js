@@ -89,10 +89,12 @@ let Providers = (function() {
 
     promiseCollectionInfo() {
       if (!this._info) {
-        // Sync's nested event-loop blocking API means we should do the fetch after
-        // an event spin.
+        // Sync's nested event-loop blocking API in Firefox 55 and older means
+        // we should do the fetch after an event spin. In Firefox 56+,
+        // `_fetchInfo` returns a promise.
         this._info = Promise.resolve().then(() => {
-          let info = Weave.Service._fetchInfo();
+          return Weave.Service._fetchInfo();
+        }).then(info => {
           let result = { status: info.status, collections: [] };
           for (let name of Object.keys(info.obj).sort()) {
             let lastModified = new Date(+info.obj[name] * 1000);
