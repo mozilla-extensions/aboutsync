@@ -431,6 +431,14 @@ const collectionComponentBuilders = {
     };
   },
 
+  async clients(provider, serverRecords) {
+    let fxaDevices = await fxAccounts.getDeviceList();
+    fxaDevices = JSON.parse(JSON.stringify(fxaDevices));
+    return {
+      "FxA Devices": createObjectInspector("Devices", fxaDevices)
+    }
+  },
+
   async passwords(provider, serverRecords) {
     Cu.import("resource://services-sync/engines/passwords.js");
     if (typeof PasswordValidator == "undefined") {
