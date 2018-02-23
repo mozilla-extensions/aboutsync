@@ -4,7 +4,9 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/AddonManager.jsm");
 Cu.import("resource://gre/modules/Preferences.jsm");
+const WeaveConstants = Cu.import("resource://services-sync/constants.js", {});
 Cu.import("resource://gre/modules/Log.jsm");
+Cu.import("resource://services-sync/main.js");
 
 XPCOMUtils.defineLazyServiceGetter(this, "AlertsService", "@mozilla.org/alerts-service;1", "nsIAlertsService");
 
@@ -175,11 +177,15 @@ function startoverObserver(subject, topic, data) {
 // We'll show some UI on certain sync status notifications - currently just
 // errors.
 SYNC_STATUS_TOPICS = [
-  "weave:ui:login:error",
-  "weave:ui:sync:error",
+  "weave:service:sync:error",
+  "weave:service:sync:finish",
+  "weave:service:login:error",
 ];
 
 function syncStatusObserver(subject, topic, data) {
+  if (!shouldReportError(data)) {
+    return;
+  }
   let clickCallback = (subject, topic, data) => {
     if (topic != "alertclickcallback")
       return;
@@ -195,6 +201,33 @@ function syncStatusObserver(subject, topic, data) {
     let body = "about-sync noticed a sync failure - click here to view sync logs";
     AlertsService.showAlertNotification(null, "Sync Failed", body, true, null, clickCallback);
   }
+}
+
+function shouldReportError(data) {
+  if (Weave.Status.service == WeaveConstants.STATUS_OK ||
+      Weave.Status.login == WeaveConstants.MASTER_PASSWORD_LOCKED) {
+    return false;
+  }
+
+  if (Weave.Status.login == WeaveConstants.LOGIN_FAILED_LOGIN_REJECTED) {
+    return true;
+  }
+
+  let lastSync = Weave.Svc.Prefs.get("lastSync");
+  if (lastSync && ((Date.now() - Date.parse(lastSync)) >
+      Weave.Svc.Prefs.get("errorhandler.networkFailureReportTimeout") * 1000)) {
+    return true;
+  }
+
+  // We got a 401 mid-sync. Wait for the next sync before actually handling
+  // an error. This assumes that we'll get a 401 again on a login fetch in
+  // order to report the error.
+  if (!Weave.Service.clusterURL) {
+    return false;
+  }
+
+  return ![Weave.Status.login, Weave.Status.sync].includes(WeaveConstants.SERVER_MAINTENANCE) &&
+         ![Weave.Status.login, Weave.Status.sync].includes(WeaveConstants.LOGIN_FAILED_NETWORK_ERROR);
 }
 
 /*
