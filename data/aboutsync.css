@@ -105,6 +105,100 @@ html {
   font-family: monospace;
   cursor: pointer;
 }
+
+/* =============================================================================
+  Panel and PanelGroup
+============================================================================= */
+
+.panelgroup {
+  overflow: hidden;
+}
+
+.panel {
+  position: relative;
+  width: 100%;
+  border-bottom: 5px;
+  border-left: 2px;
+  border-right: 2px;
+}
+
+.panelwrap {
+  max-height: 0;
+  overflow: hidden;
+  transition: all .2s ease-in-out;
+  margin-left: 1em;
+}
+
+.panel.open > .panelwrap {
+  height: auto;
+  max-height: 500px;
+  padding-bottom: 1em;
+}
+
+/* markh shamelessly stole the button css from
+   https://codepen.io/adamaoc/pen/wBGGQv, and doesn't really understand it :)
+   But basically it arranges for .before and .after to be 2 vertical lines
+   and rotates them to form either a "X" or a "V" with a cute transition.
+*/
+.panel > button {
+  position: absolute;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  height: 3em;
+  width: 3em;
+  outline: 0;
+  border: 0;
+  background: none;
+  text-indent: -9999%;
+  pointer-events: none;
+}
+
+.panel > button::before,
+.panel > button::after {
+  content: '';
+  display: block;
+  position: absolute;
+  height: 12px;
+  width: 4px;
+  border-radius: .3em;
+  background: black;
+  transform-origin: 50%;
+  top: 50%;
+  left: 50%;
+  transition: all .25s ease-in-out;
+}
+
+.panel > button::before {
+  transform: translate(75%, -50%) rotate(45deg);
+}
+
+.panel > button::after {
+  transform: translate(-75%, -50%) rotate(-45deg);
+}
+
+.panel.open > button::before {
+  height: 14px;
+  transform: translate(0%, -50%) rotate(-45deg);
+}
+
+.panel.open > button::after {
+  height: 14px;
+  transform: translate(0%, -50%) rotate(45deg);
+}
+
+.panelhead {
+  width: 100%;
+  overflow: hidden;
+  cursor: pointer;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 1em;
+  padding-right: 2.1em;
+}
+
+
 /* =============================================================================
   Bookmark tree view
 ============================================================================= */
