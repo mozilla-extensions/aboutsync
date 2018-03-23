@@ -6,7 +6,7 @@ const ReactDOM = require("react-dom");
 const { ConfigComponent } = require("./config");
 const { ProviderState, ProviderInfo } = require("./provider");
 const { CollectionsViewer } = require("./CollectionsViewer");
-const { InternalAnchor, ErrorDisplay, Fetching, importLocal } = require("./common");
+const { ErrorDisplay, Fetching, importLocal } = require("./common");
 const { AccountInfo } = require("./AccountInfo");
 
 const { Services } = importLocal("resource://gre/modules/Services.jsm");
@@ -69,16 +69,9 @@ class AboutSyncHeader extends React.Component {
           {this.renderAccountInfo()}
         </div>
         <div>
-          <p className="section-heading">Sync Info</p>
+          <p className="section-heading">Options</p>
           <div>
-            <div>
-              <InternalAnchor href="about:preferences#sync">
-                Open Sync Preferences
-              </InternalAnchor>
-            </div>
-            <div>
-              {this.props.ready && <ConfigComponent/>}
-            </div>
+            {this.props.ready && <ConfigComponent/>}
           </div>
         </div>
       </div>

@@ -13,6 +13,7 @@ const { OS } = importLocal("resource://gre/modules/osfile.jsm");
 const { Downloads } = importLocal("resource://gre/modules/Downloads.jsm");
 const { Services } = importLocal("resource://gre/modules/Services.jsm");
 const { Config } = importLocal("chrome://aboutsync/content/config.js");
+const { Panel, PanelGroup } = require("./panel");
 
 // For our "Sync Preferences" support.
 // A "log level" <select> element.
@@ -411,23 +412,15 @@ class LogFilesComponent extends React.Component {
   }
 
   render() {
-    return (
-      <fieldset>
-        <legend>Log Files</legend>
-        {this.renderSummary()}
-      </fieldset>
-    );
+    return this.renderSummary();
   }
 }
 
 // Options for the addon itself.
 function AddonPrefsComponent() {
   return (
-    <fieldset>
-      <legend>Addon Options</legend>
-      <PrefCheckbox label="Hide notification on sync errors"
-                    pref="extensions.aboutsync.hideNotifications"/>
-    </fieldset>
+    <PrefCheckbox label="Hide notification on sync errors"
+                  pref="extensions.aboutsync.hideNotifications"/>
   );
 }
 
@@ -462,7 +455,6 @@ class UserType extends React.Component {
           <p>{ut[this.state.value].description}</p>
         </div>
         {this.state.value == "custom" ? (<LoggingConfig/>) : null}
-        <LogFilesComponent/>
       </div>
     );
   }
@@ -471,10 +463,23 @@ class UserType extends React.Component {
 // The top-level options.
 function ConfigComponent() {
   return (
-    <div className="config">
-      <UserType/>
-      <AddonPrefsComponent/>
-    </div>
+    <PanelGroup>
+      <Panel title="General Options" open>
+        <UserType/>
+      </Panel>
+
+      <Panel title="Log Files and Diagnostics">
+        <LogFilesComponent/>
+      </Panel>
+
+      <Panel title="Other Options">
+        <AddonPrefsComponent/>
+        <p/>
+        <InternalAnchor href="about:preferences#sync">
+          Open Sync Preferences
+        </InternalAnchor>
+      </Panel>
+    </PanelGroup>
   );
 }
 

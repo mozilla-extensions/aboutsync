@@ -38,6 +38,10 @@ html {
   padding: 5px;
 }
 
+.header .panelhead {
+  background: #d0dce2;
+}
+
 .header > div {
   margin: 10px;
   flex-basis: 50%;
@@ -78,10 +82,6 @@ html {
   margin: 10px;
   max-width: 60px;
   border-radius: 50%;
-}
-
-.logLevel > select {
-  margin-left: 10px;
 }
 
 .collection {
