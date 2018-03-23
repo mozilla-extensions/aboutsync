@@ -93,86 +93,14 @@ function prefObserver(subject, topic, data) {
     try {
       verbose = Services.prefs.getBoolPref(PREF_VERBOSE);
     } catch (ex) {}
-  } else if (data.startsWith("services.sync.log.logger.engine.")) {
-    // This should really be built into sync itself :(
-    let engineName = data.split(".").pop();
-    let logName = "Sync.Engine." + engineName.charAt(0).toUpperCase() + engineName.slice(1);;
-    let levelString;
-    try {
-      levelString = Services.prefs.getCharPref(data);
-    } catch (ex) {}
-    if (levelString) {
-      let level = Log.Level[levelString];
-      Log.repository.getLogger(logName).level = level;
-      log("Adjusted log", logName, "to level", levelString);
-    }
   }
 }
 
-/* A facility for this addon to "persist" certain preferences across
-   Sync resets.
-
-   In general, these preferences are exposed in the addon's UI - but the
-   preference must live here so that it works even when the addon's UI isn't
-   open.
-*/
 const PREF_RESTORE_TOPICS = [
   "weave:service:start-over",
   "weave:service:start-over:finish",
 ];
 
-const PREFS_TO_RESTORE = [
-  "services.sync.log.appender.file.level",
-  "services.sync.log.appender.dump",
-  "services.sync.log.appender.file.logOnSuccess",
-  "services.sync.log.appender.file.maxErrorAge",
-  "services.sync.log.logger.engine.addons",
-  "services.sync.log.logger.engine.apps",
-  "services.sync.log.logger.engine.bookmarks",
-  "services.sync.log.logger.engine.clients",
-  "services.sync.log.logger.engine.forms",
-  "services.sync.log.logger.engine.history",
-  "services.sync.log.logger.engine.passwords",
-  "services.sync.log.logger.engine.prefs",
-  "services.sync.log.logger.engine.tabs",
-  // We can't rely on these "new" pref names until Firefox 59, but we can
-  // at least restore them for people setting them manually.
-  "services.sync.log.logger",
-  "services.sync.log.logger.engine",
-];
-
-let savedPrefs = null;
-// The observer for the notifications Sync sends as it resets.
-function startoverObserver(subject, topic, data) {
-  if (!Preferences.get("extensions.aboutsync.applyOnStartOver")) {
-    log("Sync is being reset, but aboutsync is not configured to restore prefs.");
-    return;
-  }
-  switch (topic) {
-    case "weave:service:start-over":
-      // Sync is about to reset all its prefs - save them.
-      log("Sync is starting over - saving pref values to restore");
-      savedPrefs = {};
-      for (let pref of PREFS_TO_RESTORE) {
-        if (Preferences.isSet(pref)) {
-          savedPrefs[pref] = Preferences.get(pref);
-        }
-      }
-      break;
-
-    case "weave:service:start-over:finish":
-      // Sync has completed resetting its world.
-      log("Sync startover is complete - restoring pref values");
-      for (let pref of Object.keys(savedPrefs)) {
-        Preferences.set(pref, savedPrefs[pref]);
-      }
-      savedPrefs = null;
-      break;
-
-    default:
-      log("unexpected topic", topic);
-  }
-}
 
 // We'll show some UI on certain sync status notifications - currently just
 // errors.
@@ -243,10 +171,6 @@ function startup(data, reason) {
     let pref = "services.sync.log.logger.engine." + engine;
     Services.prefs.addObserver(pref, prefObserver, false);
   }
-  // Setup our "pref restorer"
-  for (let topic of PREF_RESTORE_TOPICS) {
-    Services.obs.addObserver(startoverObserver, topic, false);
-  }
   // Register about:sync in all processes (note we only load in the parent
   // processes, but child processes need to know the page exists so it can
   // ask the parent to load it)
@@ -266,6 +190,11 @@ function startup(data, reason) {
 
   // Load into any new windows
   Services.wm.addListener(windowListener);
+
+  // for some reason we can't use chrome://aboutsync at the top-level of
+  // this module, but only after startup is called.
+  const { Config } = ChromeUtils.import("chrome://aboutsync/content/config.js");
+  Config.initialize();
 }
 
 function shutdown(data, reason) {
@@ -296,12 +225,14 @@ function shutdown(data, reason) {
   }
   Services.prefs.removeObserver(PREF_VERBOSE, prefObserver);
 
-  for (let topic of PREF_RESTORE_TOPICS) {
-    Services.obs.removeObserver(startoverObserver, topic);
-  }
   for (let topic of SYNC_STATUS_TOPICS) {
     Services.obs.removeObserver(syncStatusObserver, topic);
   }
+
+  const { Config } = Cu.import("chrome://aboutsync/content/config.js");
+  Config.finalize();
+  // And unload it, so changes will get picked up if we reload the addon.
+  Cu.unload("chrome://aboutsync/content/config.js");
 }
 
 function install(data, reason) {}

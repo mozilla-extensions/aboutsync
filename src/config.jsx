@@ -12,6 +12,7 @@ const { FileUtils } = importLocal("resource://gre/modules/FileUtils.jsm");
 const { OS } = importLocal("resource://gre/modules/osfile.jsm");
 const { Downloads } = importLocal("resource://gre/modules/Downloads.jsm");
 const { Services } = importLocal("resource://gre/modules/Services.jsm");
+const { Config } = importLocal("chrome://aboutsync/content/config.js");
 
 // For our "Sync Preferences" support.
 // A "log level" <select> element.
@@ -414,7 +415,6 @@ class LogFilesComponent extends React.Component {
       <fieldset>
         <legend>Log Files</legend>
         {this.renderSummary()}
-        <LoggingConfig/>
       </fieldset>
     );
   }
@@ -431,14 +431,51 @@ function AddonPrefsComponent() {
   );
 }
 
+// A "user profile" (but we call it a "user type" as profile is too overloaded)
+class UserType extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {value: Config.getCurrentUserType()};
+  }
+
+  handleChange(event) {
+    Config.changeUserType(event.target.value);
+    this.setState({value: Config.getCurrentUserType()});
+  }
+
+  render() {
+    // An array with the IDs in the content.
+    let ut = Config.getUserTypes();
+    let options = [];
+    for (let id of Object.keys(ut)) {
+      options.push(Object.assign({id}, ut[id]));
+    }
+    return (
+      <div>
+        Please describe how you intend using about:sync<br/>
+        <select value={this.state.value} onChange={event => this.handleChange(event)}>
+          {options.map(n =>
+            <option value={n.id} key={n.id}>{n.title}</option>
+          )}
+        </select>
+        <div>
+          <p>{ut[this.state.value].description}</p>
+        </div>
+        {this.state.value == "custom" ? (<LoggingConfig/>) : null}
+        <LogFilesComponent/>
+      </div>
+    );
+  }
+}
+
 // The top-level options.
-function PrefsComponent() {
+function ConfigComponent() {
   return (
-    <div className="logLevel">
-      <LogFilesComponent/>
+    <div className="config">
+      <UserType/>
       <AddonPrefsComponent/>
     </div>
   );
 }
 
-module.exports = { PrefsComponent, PrefCheckbox };
+module.exports = { ConfigComponent, PrefCheckbox };

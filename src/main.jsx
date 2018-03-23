@@ -3,7 +3,7 @@ const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 const React = require("react");
 const ReactDOM = require("react-dom");
 
-const { PrefsComponent } = require("./config");
+const { ConfigComponent } = require("./config");
 const { ProviderState, ProviderInfo } = require("./provider");
 const { CollectionsViewer } = require("./CollectionsViewer");
 const { InternalAnchor, ErrorDisplay, Fetching, importLocal } = require("./common");
@@ -77,7 +77,7 @@ class AboutSyncHeader extends React.Component {
               </InternalAnchor>
             </div>
             <div>
-              {this.props.ready && <PrefsComponent/>}
+              {this.props.ready && <ConfigComponent/>}
             </div>
           </div>
         </div>
