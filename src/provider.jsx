@@ -361,11 +361,11 @@ const ProviderState = {
   },
 }
 
-// Options for what "provider" is used.
-class ProviderOptions extends React.Component {
+class ProviderInfo extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      anonymize: true,
       local: ProviderState.useLocalProvider,
       url: ProviderState.url,
     };
@@ -381,6 +381,26 @@ class ProviderOptions extends React.Component {
   render() {
     let onLocalClick = event => {
       this.setState({ local: true });
+    };
+    let onExportClick = () => {
+      const nsIFilePicker = Ci.nsIFilePicker;
+      let titleText = "Select name to export the JSON data to";
+      let fp = Cc["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+      let fpCallback = result => {
+        if (result == nsIFilePicker.returnOK || result == nsIFilePicker.returnReplace) {
+          let filename = fp.file.QueryInterface(Ci.nsIFile).path;
+          this.props.provider.promiseExport(filename, this.state.anonymize).then(() => {
+            alert("File created");
+          }).catch(err => {
+            console.error("Failed to create file", err);
+            alert("Failed to create file: " + err);
+          });
+        }
+      }
+
+      fp.init(window, titleText, nsIFilePicker.modeSave);
+      fp.appendFilters(nsIFilePicker.filterAll);
+      fp.open(fpCallback);
     };
     let onExternalClick = event => {
       this.setState({ local: false });
@@ -403,77 +423,38 @@ class ProviderOptions extends React.Component {
     };
 
     return (
-      <div>
-        <p>
-          <label>
-            <input type="radio" checked={this.state.local} onChange={onLocalClick}/>
-            Load local sync data
-          </label>
-          <span className="provider-extra" hidden={!this.state.local}>
-            <PrefCheckbox label="Limit history engine fetch to first 5000 records?"
-                          pref="extensions.aboutsync.limitHistoryFetch"
-                          defaultValue={true}/>
-          </span>
-        </p>
-        <p>
-          <label>
-            <input type="radio" checked={!this.state.local} onChange={onExternalClick}/>
-            Load JSON from URL
-          </label>
-          <span className="provider-extra" hidden={this.state.local}>
-            <input value={this.state.url} onChange={onInputChange} />
-            <button onClick={onChooseClick}>Choose local file...</button>
-          </span>
-        </p>
-      </div>
-    );
-  }
-}
-
-class ProviderInfo extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      anonymize: true
-    };
-  }
-
-  render() {
-    let onExportClick = () => {
-      const nsIFilePicker = Ci.nsIFilePicker;
-      let titleText = "Select name to export the JSON data to";
-      let fp = Cc["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-      let fpCallback = result => {
-        if (result == nsIFilePicker.returnOK || result == nsIFilePicker.returnReplace) {
-          let filename = fp.file.QueryInterface(Ci.nsIFile).path;
-          this.props.provider.promiseExport(filename, this.state.anonymize).then(() => {
-            alert("File created");
-          }).catch(err => {
-            console.error("Failed to create file", err);
-            alert("Failed to create file: " + err);
-          });
-        }
-      }
-
-      fp.init(window, titleText, nsIFilePicker.modeSave);
-      fp.appendFilters(nsIFilePicker.filterAll);
-      fp.open(fpCallback);
-    };
-
-    let providerIsLocal = this.props.provider.isLocal;
-    return (
       <fieldset>
         <legend>Data provider options</legend>
-        <ProviderOptions />
+        <div>
+          <p>
+            <label className="provider">
+              <input type="radio" checked={this.state.local} onChange={onLocalClick}/>
+              Load local sync data
+            </label>
+            <span className="provider-extra" hidden={!this.state.local}>
+              <PrefCheckbox label="Limit history engine fetch to first 5000 records?"
+                            pref="extensions.aboutsync.limitHistoryFetch"
+                            defaultValue={true}/>
+              <label>
+                <input type="checkbox" defaultChecked={true}
+                       onChange={ev => this.setState({anonymize: ev.target.checked})}/>
+                Anonymize data
+              </label>
+              <button onClick={onExportClick}>Export to file...</button>
+            </span>
+          </p>
+          <p>
+            <label className="provider">
+              <input type="radio" checked={!this.state.local} onChange={onExternalClick}/>
+              Load JSON from URL
+            </label>
+            <span className="provider-extra" hidden={this.state.local}>
+              <input value={this.state.url} onChange={onInputChange} />
+              <button onClick={onChooseClick}>Choose local file...</button>
+            </span>
+          </p>
+        </div>
         <button onClick={() => this.props.updateProvider()}>Load</button>
-        <button onClick={onExportClick} hidden={!providerIsLocal}>Export to file...</button>
-        <span hidden={providerIsLocal}>
-          <label>
-            <input type="checkbox" defaultChecked={true}
-                   onChange={ev => this.setState({anonymize: event.target.checked})}/>
-            Anonymize data
-          </label>
-        </span>
       </fieldset>
     );
   }

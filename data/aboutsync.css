@@ -94,6 +94,10 @@ html {
   margin-left: 5px;
 }
 
+.provider-extra label {
+  display: block;
+}
+
 .inline-id {
   border-bottom: 1px;
   border-bottom-color: green;
