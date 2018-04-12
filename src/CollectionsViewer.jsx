@@ -236,7 +236,9 @@ class CollectionViewer extends React.Component {
   }
 
   renderTabs() {
-    let engine = Weave.Service.engineManager.get(this.props.info.name);
+    let engine = this.props.info.name == "clients" ?
+                 Weave.Service.clientsEngine :
+                 Weave.Service.engineManager.get(this.props.info.name);
     return (
       <TabView>
         <TabPanel name="Summary" key="summary">
