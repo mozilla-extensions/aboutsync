@@ -22,7 +22,7 @@ function getSqlColumnNames(sql) {
   // No way to get column names from the async api :(... Bug 1326565.
   let stmt;
   try {
-    const db = PlacesUtils.history.QueryInterface(Ci.nsPIPlacesDatabase).DBConnection;
+    const db = PlacesUtils.history.DBConnection;
     stmt = db.createStatement(sql);
     const columns = [];
     for (let i = 0; i < stmt.columnCount; ++i) {
