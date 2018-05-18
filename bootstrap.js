@@ -8,6 +8,11 @@ const WeaveConstants = Cu.import("resource://services-sync/constants.js", {});
 Cu.import("resource://gre/modules/Log.jsm");
 Cu.import("resource://services-sync/main.js");
 
+if (typeof console !== "object") {
+  XPCOMUtils.defineLazyModuleGetter(this, "console",
+                                    "resource://gre/modules/Console.jsm");
+}
+
 XPCOMUtils.defineLazyServiceGetter(this, "AlertsService", "@mozilla.org/alerts-service;1", "nsIAlertsService");
 
 // data: URIs we use with the nsIProcessScriptLoader to register "about:sync"
@@ -193,7 +198,7 @@ function startup(data, reason) {
 
   // for some reason we can't use chrome://aboutsync at the top-level of
   // this module, but only after startup is called.
-  const { Config } = ChromeUtils.import("chrome://aboutsync/content/config.js");
+  const { Config } = Cu.import("chrome://aboutsync/content/config.js", {});
   Config.initialize();
 }
 
@@ -229,7 +234,7 @@ function shutdown(data, reason) {
     Services.obs.removeObserver(syncStatusObserver, topic);
   }
 
-  const { Config } = Cu.import("chrome://aboutsync/content/config.js");
+  const { Config } = Cu.import("chrome://aboutsync/content/config.js", {});
   Config.finalize();
   // And unload it, so changes will get picked up if we reload the addon.
   Cu.unload("chrome://aboutsync/content/config.js");

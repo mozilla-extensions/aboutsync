@@ -93,8 +93,8 @@ const collectionComponentBuilders = {
 
   async clients(provider, serverRecords) {
     const fxAccounts = importLocal("resource://gre/modules/FxAccounts.jsm").fxAccounts;
-    let fxaDevices = await fxAccounts.getDeviceList();
-    fxaDevices = JSON.parse(JSON.stringify(fxaDevices));
+    let fxaDevices = typeof fxAccounts.getDeviceList == "function" ?
+                     Cu.cloneInto(await fxAccounts.getDeviceList(), {}) : [];
     return {
       "FxA Devices": <ObjectInspector name="Devices" data={fxaDevices} expandLevel={1}/>
     };

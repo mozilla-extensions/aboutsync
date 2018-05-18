@@ -5,8 +5,16 @@
 // This is a bit of a special module in that it's imported both by bootstrap.js
 // and by the react-based UI code, and we also want it to be a singleton.
 
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
+
 const { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
 const { Preferences } = Cu.import("resource://gre/modules/Preferences.jsm", {});
+const { XPCOMUtils } = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
+
+if (typeof console !== "object") {
+  XPCOMUtils.defineLazyModuleGetter(this, "console",
+                                    "resource://gre/modules/Console.jsm");
+}
 
 function fixDesc(desc) {
   return desc.replace(/( |\t|\r|\n)+/g, " ");
