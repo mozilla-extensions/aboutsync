@@ -138,7 +138,14 @@ function initialize() {
 }
 
 function finalize() {
-  Services.obs.removeObserver(startoverObserver, "weave:service:start-over:finish");
+  let observers = Services.obs.enumerateObservers("weave:service:start-over:finish");
+  while (observers.hasMoreElements()) {
+    let observer = observers.getNext();
+    if (observer == startoverObserver) {
+      Services.obs.removeObserver(observer, "weave:service:start-over:finish");
+      break;
+    }
+  }
 }
 
 
