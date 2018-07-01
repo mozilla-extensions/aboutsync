@@ -10,7 +10,7 @@ SOURCE_ZIP=${APP_NAME}-sources.zip
 ZIP_CMD="zip -9 -q"
 
 rm $XPI
-$ZIP_CMD $XPI README.md chrome.manifest install.rdf bootstrap.js
+$ZIP_CMD $XPI README.md chrome.manifest manifest.json ext_bootstrap.js webext/*
 
 # It's called build-js since it doesn't exeucte this build script
 npm run build-js

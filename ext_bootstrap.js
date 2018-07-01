@@ -109,7 +109,7 @@ const PREF_RESTORE_TOPICS = [
 
 // We'll show some UI on certain sync status notifications - currently just
 // errors.
-SYNC_STATUS_TOPICS = [
+const SYNC_STATUS_TOPICS = [
   "weave:service:sync:error",
   "weave:service:sync:finish",
   "weave:service:login:error",
@@ -168,6 +168,13 @@ function shouldReportError(data) {
  */
 function startup(data, reason) {
   log("starting up");
+
+  // register our manifest.
+  let reg = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
+  let uri = Services.io.newURI(data.context.extension.resourceURL + "chrome.manifest");
+  uri.QueryInterface(Ci.nsIFileURL);
+  reg.autoRegister(uri.file);
+
   // Watch for prefs we care about.
   Services.prefs.addObserver(PREF_VERBOSE, prefObserver, false);
   // Ensure initial values are picked up.
@@ -205,8 +212,9 @@ function startup(data, reason) {
 function shutdown(data, reason) {
   // When the application is shutting down we normally don't have to clean
   // up any UI changes made
-  if (reason == APP_SHUTDOWN)
-    return;
+  // XXX - although it seems impossible to differentiate this in a webext world :(
+//  if (reason == APP_SHUTDOWN)
+//    return;
 
   // Stop registering about:sync in new processes.
   Services.ppmm.removeDelayedProcessScript(DATA_URI_REGISTER_ABOUT);
@@ -242,3 +250,13 @@ function shutdown(data, reason) {
 
 function install(data, reason) {}
 function uninstall(data, reason) {}
+
+// shims for webextension hacks.
+var EXPORTED_SYMBOLS = ["AboutSyncBootstrap"];
+
+this.AboutSyncBootstrap = {
+  startup,
+  shutdown,
+  install,
+  uninstall,
+};

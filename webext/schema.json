@@ -1,0 +1,14 @@
+[
+  {
+    "namespace": "aboutsync",
+    "functions": [
+      {
+        "name": "startup",
+        "type": "function",
+        "description": "Performs necessary startup functions",
+        "async": true,
+        "parameters": []
+      }
+    ]
+  }
+]
