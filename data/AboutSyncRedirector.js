@@ -9,8 +9,10 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 const INDEX_HTML = "chrome://aboutsync/content/index.html";
 
+const generateQI = XPCOMUtils.generateQI || ChromeUtils.generateQI;
+
 const AboutSyncRedirector = {
-  QueryInterface: XPCOMUtils.generateQI([Ci.nsIAboutModule]),
+  QueryInterface: generateQI([Ci.nsIAboutModule]),
   classID: Components.ID("{decc7a05-f6c6-4624-9e58-176c84d032af}"),
 
   getURIFlags() {
