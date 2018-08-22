@@ -3,6 +3,10 @@ html {
   font-size: 12px;
 }
 
+.action-button {
+  margin-top: 1.5em;
+}
+
 /* .state-* selectors for the state of the Firefox Account */
 .state-container {
   display: none;

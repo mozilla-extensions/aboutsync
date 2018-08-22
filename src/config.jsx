@@ -14,6 +14,7 @@ const { Downloads } = importLocal("resource://gre/modules/Downloads.jsm");
 const { Services } = importLocal("resource://gre/modules/Services.jsm");
 const { Config } = importLocal("chrome://aboutsync/content/config.js");
 const { Panel, PanelGroup } = require("./panel");
+const { Weave } = importLocal("resource://services-sync/main.js");
 
 // For our "Sync Preferences" support.
 // A "log level" <select> element.
@@ -355,6 +356,14 @@ class LogFilesComponent extends React.Component {
     });
   }
 
+  flushLog(event) {
+    let eh = Weave.Service.errorHandler;
+    eh._log.info("about:sync flushing log file due to user request");
+    eh.resetFileLog().catch(err => {
+      console.error("Failed to flush the log", err);
+    });
+  }
+
   componentDidMount() {
     // find all our log-files.
     let logDir = FileUtils.getDir("ProfD", ["weave", "logs"]);
@@ -407,6 +416,11 @@ class LogFilesComponent extends React.Component {
         <a href="#" onClick={event => this.downloadZipFile(event)}>
           download them as a zip file
         </a>
+        <div>
+          <button className="action-button" onClick={event => this.flushLog(event)}>
+            Force a new (probably empty) log now
+          </button>
+        </div>
       </div>
     );
   }
