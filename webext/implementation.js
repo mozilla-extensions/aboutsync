@@ -4,7 +4,8 @@ this.aboutsync = class extends ExtensionAPI {
       aboutsync: {
         startup() {
           try {
-            let ns = Cu.import(context.extension.resourceURL + "ext_bootstrap.js", {});
+            let bootstrap = context.extension.resourceURL + "ext_bootstrap.js";
+            let ns = Cu.import(bootstrap, {});
             ns.startup({context}, null);
 
             // This is the only sane way I can see to register for shutdown!
@@ -15,6 +16,9 @@ this.aboutsync = class extends ExtensionAPI {
                 } catch (ex) {
                   console.error("FAILED to shutdown", ex);
                 }
+                ns = null;
+                Cu.unload(bootstrap);
+
               }
             }
             context.extension.onShutdown.add(closer);
