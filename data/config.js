@@ -37,6 +37,8 @@ const userTypes = {
       "services.sync.log.appender.dump": "Trace",
       "services.sync.log.logger": "Trace",
       "services.sync.log.logger.engine": "Trace",
+      // Trace logging for everything is too noisy for the network logger.
+      "services.sync.log.logger.network.resources": "Debug",
     },
   },
 
