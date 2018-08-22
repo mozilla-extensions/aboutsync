@@ -8,6 +8,7 @@ const { TabView, TabPanel } = require("./TabView");
 const { Fetching, ObjectInspector, ErrorDisplay, arrayCloneWithoutJank, importLocal } = require("./common");
 const { TableInspector } = require("./AboutSyncTableInspector");
 const { AboutSyncRecordEditor } = require("./AboutSyncRecordEditor");
+const { EngineActions } = require("./EngineActions");
 const { ProviderState } = require("./provider");
 const { PlacesSqlView, promiseSql } = require("./PlacesSqlView");
 
@@ -266,6 +267,12 @@ class CollectionViewer extends React.Component {
           </TabPanel>
         )}
         {this.renderAdditionalTabs()}
+        {this.props.provider.isLocal && engine && engine.resetClient && (
+          <TabPanel name="Engine Actions" key="actions">
+            <EngineActions
+              engine={engine}/>
+          </TabPanel>
+        )}
       </TabView>
     );
   }
