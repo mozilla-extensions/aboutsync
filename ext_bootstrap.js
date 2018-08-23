@@ -114,6 +114,11 @@ function shouldReportError(data) {
          ![Weave.Status.login, Weave.Status.sync].includes(WeaveConstants.LOGIN_FAILED_NETWORK_ERROR);
 }
 
+let isAppShuttingDown = false;
+function onQuitApplicationGranted() {
+  isAppShuttingDown = true;
+}
+
 /*
  * Extension entry points
  */
@@ -144,6 +149,8 @@ function startup(data, reason) {
     Services.obs.addObserver(syncStatusObserver, topic, false);
   }
 
+  Services.obs.addObserver(onQuitApplicationGranted, "quit-application-granted", false);
+
   // for some reason we can't use chrome://aboutsync at the top-level of
   // this module, but only after startup is called.
   const { Config } = Cu.import("chrome://aboutsync/content/config.js", {});
@@ -151,11 +158,15 @@ function startup(data, reason) {
 }
 
 function shutdown(data, reason) {
-  // When the application is shutting down we normally don't have to clean
-  // up any UI changes made
-  // XXX - although it seems impossible to differentiate this in a webext world :(
-//  if (reason == APP_SHUTDOWN)
-//    return;
+  // When the application is shutting down we don't have to clean anything up.
+  // (Note that there's no actual guarantee isAppShuttingDown will be set
+  // by the time we are called here, but it usually is, and this is just an
+  // optimization, so it doesn't really matter if it isn't)
+  if (isAppShuttingDown) {
+    return;
+  }
+
+  log("extension is shutting down");
 
   // Stop registering about:sync in new processes.
   Services.ppmm.removeDelayedProcessScript(DATA_URI_REGISTER_ABOUT);
@@ -165,6 +176,8 @@ function shutdown(data, reason) {
   let wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
 
   Services.prefs.removeObserver(PREF_VERBOSE, prefObserver);
+
+  Services.obs.removeObserver(onQuitApplicationGranted, "quit-application-granted");
 
   for (let topic of SYNC_STATUS_TOPICS) {
     Services.obs.removeObserver(syncStatusObserver, topic);
