@@ -26,7 +26,7 @@ echo
 # build it. A full zip, including node-modules, is too large.
 [ -e $SOURCE_ZIP ] && rm $SOURCE_ZIP
 $ZIP_CMD $SOURCE_ZIP * -x aboutsync*
-$ZIP_CMD $SOURCE_ZIP -r data lib src
+$ZIP_CMD $SOURCE_ZIP -r data lib src webext
 find $SOURCE_ZIP -maxdepth 1 -printf '%f, %s bytes'
 echo
 

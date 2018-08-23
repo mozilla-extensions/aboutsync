@@ -114,6 +114,29 @@ function shouldReportError(data) {
          ![Weave.Status.login, Weave.Status.sync].includes(WeaveConstants.LOGIN_FAILED_NETWORK_ERROR);
 }
 
+// Register a chrome URL. This sucks in so many ways
+// 1) That we need a chrome URL at all. We can get quite a way with just a
+//    resource URL, until it comes time to load index.html, at which time we
+//    don't have chrome permissions (which is a shame, as we can Cu.import
+//    our modules from the same resource:// base URL and they do have chrome
+//    permissions)
+// 2) We have to call addBootstrappedManifestLocation, which is probably
+//    going to go away once bootstrapped extensions do. If we weren't in a .xpi
+//    file we could call nsIComponentRegistrar.autoRegister with an nsIFile
+//    pointing at our chrome.manifest.
+function registerChrome(data) {
+  let mgr = Components.manager.QueryInterface(Ci.nsIComponentManager);
+  let url = data.context.extension.resourceURL;
+  let match = url.match(/^jar:(.+?)!\/$/);
+  if (match) {
+    url = match[1];
+  }
+
+  let uri = Services.io.newURI(url);
+  uri.QueryInterface(Ci.nsIFileURL);
+  mgr.addBootstrappedManifestLocation(uri.file);
+}
+
 let isAppShuttingDown = false;
 function onQuitApplicationGranted() {
   isAppShuttingDown = true;
@@ -125,11 +148,7 @@ function onQuitApplicationGranted() {
 function startup(data, reason) {
   log("starting up");
 
-  // register our manifest.
-  let reg = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
-  let uri = Services.io.newURI(data.context.extension.resourceURL + "chrome.manifest");
-  uri.QueryInterface(Ci.nsIFileURL);
-  reg.autoRegister(uri.file);
+  registerChrome(data);
 
   // Watch for prefs we care about.
   Services.prefs.addObserver(PREF_VERBOSE, prefObserver, false);
