@@ -114,27 +114,16 @@ function shouldReportError(data) {
          ![Weave.Status.login, Weave.Status.sync].includes(WeaveConstants.LOGIN_FAILED_NETWORK_ERROR);
 }
 
-// Register a chrome URL. This sucks in so many ways
-// 1) That we need a chrome URL at all. We can get quite a way with just a
-//    resource URL, until it comes time to load index.html, at which time we
-//    don't have chrome permissions (which is a shame, as we can Cu.import
-//    our modules from the same resource:// base URL and they do have chrome
-//    permissions)
-// 2) We have to call addBootstrappedManifestLocation, which is probably
-//    going to go away once bootstrapped extensions do. If we weren't in a .xpi
-//    file we could call nsIComponentRegistrar.autoRegister with an nsIFile
-//    pointing at our chrome.manifest.
+let chromeHandle;
+// Register a chrome URL, which is the only way we've found to have scripts
+// loaded by our index.html to have chrome permissions.
 function registerChrome(data) {
-  let mgr = Components.manager.QueryInterface(Ci.nsIComponentManager);
-  let url = data.context.extension.resourceURL;
-  let match = url.match(/^jar:(.+?)!\/$/);
-  if (match) {
-    url = match[1];
-  }
-
-  let uri = Services.io.newURI(url);
-  uri.QueryInterface(Ci.nsIFileURL);
-  mgr.addBootstrappedManifestLocation(uri.file);
+  let aomStartup = Cc["@mozilla.org/addons/addon-manager-startup;1"]
+                               .getService(Ci.amIAddonManagerStartup);
+  const manifestURI = Services.io.newURI("manifest.json", null, data.context.extension.rootURI);
+  chromeHandle = aomStartup.registerChrome(manifestURI, [
+    ["content", "aboutsync", "data/"],
+  ]);
 }
 
 let isAppShuttingDown = false;
@@ -206,6 +195,9 @@ function shutdown(data, reason) {
   Config.finalize();
   // And unload it, so changes will get picked up if we reload the addon.
   Cu.unload("chrome://aboutsync/content/config.js");
+
+  chromeHandle.destruct();
+  chromeHandle = null;
 }
 
 function install(data, reason) {}
