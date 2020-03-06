@@ -130,6 +130,9 @@ class LoggingConfig extends React.Component {
         <LogLevelComponent label="Level of messages written to about:sync-logs log files"
                            prefs={["services.sync.log.appender.file.level"]}/>
 
+        <LogLevelComponent label="Level of messages written to the Browser Console - useful for live debugging, when a log file isn't always flushed"
+                           prefs={["services.sync.log.appender.console"]}/>
+
         <LogLevelComponent label="Level of messages written to dump - useful primarily for developers"
                            prefs={["services.sync.log.appender.dump"]}/>
 
