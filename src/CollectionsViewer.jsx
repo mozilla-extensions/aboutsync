@@ -94,8 +94,16 @@ const collectionComponentBuilders = {
 
   async clients(provider, serverRecords) {
     const fxAccounts = importLocal("resource://gre/modules/FxAccounts.jsm").fxAccounts;
-    let fxaDevices = typeof fxAccounts.getDeviceList == "function" ?
-                     Cu.cloneInto(await fxAccounts.getDeviceList(), {}) : [];
+    let fxaDevices = [];
+    if (typeof fxAccounts.device == "object" && "recentDeviceList" in fxAccounts.device) {
+      // Force a refresh of the device list, so that we always show the most
+      // recent info. This API was added in bug 1583413 (Firefox 71+).
+      await fxAccounts.device.refreshDeviceList({ ignoreCached: true });
+      fxaDevices = Cu.cloneInto(fxAccounts.device.recentDeviceList, {});
+    } else if (typeof fxAccounts.getDeviceList == "function") {
+      // This API was added in bug 1227527 (Firefox 46-70).
+      fxaDevices = Cu.cloneInto(await fxAccounts.getDeviceList(), {});
+    }
     return {
       "FxA Devices": <ObjectInspector name="Devices" data={fxaDevices} expandLevel={1}/>
     };
