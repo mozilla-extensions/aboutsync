@@ -5,10 +5,9 @@ server data for your account. It is designed primarily for Sync developers, or
 advanced users who would like some insights into their Sync data.
 
 It only works on desktop Firefox.
-Once installed, you can either select "About Sync" from the tools menu, or
-just type about:sync into the URL bar.
+Once installed, you can type about:sync into the URL bar.
 
-The source code is at https://github.com/mhammond/aboutsync and pull requests
+The source code is at https://github.com/mozilla-extensions/aboutsync and pull requests
 are welcome!
 
 # Development
@@ -34,6 +33,13 @@ Other notes:
   console. Note that console.log etc can be used in the "data" JS.
 
 # Release Process
+
+Because this addon must be signed by the addons team, we follow the process
+[documented here](https://github.com/mozilla-extensions/xpi-manifest/blob/master/docs/releasing-a-xpi.md)
+
+[TODO: Fill this out more once I work out what that actually means!]
+
+Old instructions:
 
 * Edit manifest.json and bump the version number.
 
@@ -62,34 +68,4 @@ Other notes:
     git push --tags
   ```
 
-* In Firefox, visit https://send.firefox.com/ and upload the .xpi.
-
-* Send an email to [amo-admins@mozilla.com](mailto:amo-admins@mozilla.com) from
-  your mozilla.com email address, including:
-  * A link to the .xpi you put up on send.firefox.com
-  * A link to https://github.com/mhammond/aboutsync/archive/{your-release-number}.zip
-    as the source code for the release.
-  * A bit of a change log.
-
-  Here's a bit of a template you might find helpful:
-
-  ```
-  Hi amo-admins,
-    There's a new version of the about:sync addon which the Sync team
-    would like to see signed and released at your earliest convenience.
-
-    In case you've forgotten about this addon, it embeds an
-    "experimental api", so we can't go  through the normal release
-    process.
-
-  * The new version is XXXX
-  * The unsigned XPI can be retrieved from XXX
-  * The sources can be downloaded from https://github.com/mhammond/aboutsync/archive/XXX.zip
-
-  A quick changelog for user-facing changes in
-  this version:
-
-  * <insert changes here>
-  ```
-
-* Wait for confirmation that everything is good!
+* [snip old details about how to send the XPI to the amo-admins for signing]

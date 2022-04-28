@@ -3,7 +3,7 @@
   "manifest_version": 2,
   "name": "About Sync",
   "version": "0.0.52",
-  "homepage_url": "https://github.com/mhammond/aboutsync",
+  "homepage_url": "https://github.com/mozilla-extensions/aboutsync",
 
   "applications": {
     "gecko": {
