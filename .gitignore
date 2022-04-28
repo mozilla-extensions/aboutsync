@@ -1,4 +1,3 @@
-aboutsync*.xpi
-aboutsync-sources.zip
 node_modules
-data/build.js
+data/build.js*
+web-ext-artifacts
