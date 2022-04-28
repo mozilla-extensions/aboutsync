@@ -13,8 +13,8 @@ module.exports = {
         test: /.jsx$/,
         loader: "babel-loader",
         exclude: /node_modules/,
-        query: {
-          presets: ["react"]
+        options: {
+          presets: ["@babel/react"],
         }
       }
     ]
