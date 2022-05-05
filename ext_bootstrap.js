@@ -15,18 +15,6 @@ if (typeof console !== "object") {
 
 XPCOMUtils.defineLazyServiceGetter(this, "AlertsService", "@mozilla.org/alerts-service;1", "nsIAlertsService");
 
-// data: URIs we use with the nsIProcessScriptLoader to register "about:sync"
-// in all processes.
-const DATA_URI_REGISTER_ABOUT = "data:,new " + function() {
-  Components.utils.import("chrome://aboutsync/content/AboutSyncRedirector.js");
-  AboutSyncRedirector.register();
-};
-
-const DATA_URI_UNREGISTER_ABOUT = "data:,new " + function() {
-  Components.utils.import("chrome://aboutsync/content/AboutSyncRedirector.js");
-  AboutSyncRedirector.unregister();
-};
-
 const PREF_VERBOSE = "extensions.aboutsync.verbose";
 let verbose = false;
 
@@ -150,7 +138,7 @@ function startup(data, reason) {
   // Register about:sync in all processes (note we only load in the parent
   // processes, but child processes need to know the page exists so it can
   // ask the parent to load it)
-  Services.ppmm.loadProcessScript(DATA_URI_REGISTER_ABOUT, true);
+  Services.ppmm.loadProcessScript("chrome://aboutsync/content/RegisterRedirector.js", true);
 
   // We'll display a notification on sync failure.
   for (let topic of SYNC_STATUS_TOPICS) {
@@ -179,7 +167,7 @@ function shutdown(data, reason) {
   // Stop registering about:sync in new processes.
   Services.ppmm.removeDelayedProcessScript(DATA_URI_REGISTER_ABOUT);
   // And unregister about:sync in any processes we've already loaded in.
-  Services.ppmm.loadProcessScript(DATA_URI_UNREGISTER_ABOUT, false);
+  Services.ppmm.loadProcessScript("chrome://aboutsync/content/UnregisterRedirector.js", true);
 
   let wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
 
