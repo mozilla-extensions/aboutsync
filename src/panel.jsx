@@ -36,7 +36,7 @@ class Panel extends React.Component {
         <button>toggle</button>
         <div className="panelhead" onClick={evt => this.handleClick(evt)}>{this.props.title}</div>
         <div className="panelwrap">
-          <div className="panelcontent">
+          <div className="panelContent">
             {this.props.children}
           </div>
         </div>

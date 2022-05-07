@@ -1,6 +1,7 @@
 html {
-  font: message-box;
   font-size: 12px;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue",
+  Helvetica, Arial, "Lucida Grande", sans-serif;
 }
 
 .action-button {
@@ -36,21 +37,25 @@ html {
   background-size: 15px;
 }
 
-.header {
+.mainContainer {
+  padding: 20px 10px 20px;
+}
+
+.topHeader {
+  padding: 10px;
   display: flex;
-  background: #eaeff2;
-  padding: 5px;
+  box-shadow: 10px 10px 5px #0000000f;
+  border-radius: 10px;
+  background-color: #cad2d7;
+  margin: 10px;
+}
+
+.topHeaderContainer {
+  padding: 1em;
 }
 
 .header .panelhead {
   background: #d0dce2;
-}
-
-.header > div {
-  margin: 10px;
-  flex-basis: 50%;
-  flex-grow: 1;
-  display: inline-block;
 }
 
 .section-heading {
@@ -63,14 +68,18 @@ html {
   padding-bottom: 10px;
 }
 
-.collectionLastModified {
-  font-size: 70%;
+.collections {
+  background-color: white;
+  margin: 10px;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px;
+  overflow: auto;
 }
 
 .collectionSummary {
   margin-top: 2px;
   margin-bottom: 2px;
-  font-size: 70%;
 }
 
 .profileContainer {
@@ -130,13 +139,19 @@ html {
   max-height: 0;
   overflow: hidden;
   transition: all .2s ease-in-out;
-  margin-left: 1em;
+  margin: 0 1em;
 }
 
 .panel.open > .panelwrap {
   height: auto;
   max-height: 500px;
-  padding-bottom: 1em;
+  padding: 1em;
+
+}
+
+.panelContent {
+  padding: 10px;
+  padding-left: 0;
 }
 
 /* markh shamelessly stole the button css from
@@ -192,7 +207,6 @@ html {
 }
 
 .panelhead {
-  width: 100%;
   overflow: hidden;
   cursor: pointer;
   font-weight: 700;
@@ -200,6 +214,10 @@ html {
   text-overflow: ellipsis;
   padding: 1em;
   padding-right: 2.1em;
+  margin: 2px;
+  border-radius: 4px;
+  background-color: #eaeff2;
+
 }
 
 
@@ -209,7 +227,6 @@ html {
 .bookmark-description {
   margin-top: 0px;
   margin-bottom: 0px;
-  font-size: 70%;
   color: gray;
 }
 
@@ -237,7 +254,6 @@ html {
 
 .tabs-menu-item {
   display: inline-block;
-  font-size: 70%;
 }
 
 .tabs-menu-item a {
@@ -267,12 +283,9 @@ html {
 }
 
 .table-inspector {
-  font-family: monospace;
-  line-height: 1;
   border-spacing: 0;
   border-collapse: collapse;
   border: 1px solid #bbb;
-  table-layout: fixed;
 }
 
 .table-inspector th, .table-inspector td {
@@ -375,20 +388,6 @@ html {
   padding: 5px;
   color: rgb(128, 0, 0);
   position: relative;
-}
-
- {
-  position: absolute;
-  right: 5px;
-  background: 0;
-  border: 0;
-  font-size: 20px;
-  font-weight: bold;
-  color: rgb(128, 0, 0);
-  cursor: pointer;
-  top: 2px;
-  padding: 0;
-  opacity: 0.5;
 }
 
 .error-message .close-error:hover {

@@ -1,0 +1,10 @@
+/* Change */
+@media (prefers-color-scheme: dark) {
+    .topHeader {
+      color: black;
+    }
+
+    .collections {
+      color: black;
+    }
+  }

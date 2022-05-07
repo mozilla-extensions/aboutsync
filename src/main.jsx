@@ -3,11 +3,11 @@ const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 const React = require("react");
 const ReactDOM = require("react-dom");
 
+import AccountInfo from "./AccountInfo";
 const { ConfigComponent } = require("./config");
 const { ProviderState, ProviderInfo } = require("./provider");
 const { CollectionsViewer } = require("./CollectionsViewer");
 const { ErrorDisplay, Fetching, importLocal } = require("./common");
-const { AccountInfo } = require("./AccountInfo");
 
 const { Services } = importLocal("resource://gre/modules/Services.jsm");
 const { fxAccounts } = importLocal("resource://gre/modules/FxAccounts.jsm");
@@ -64,11 +64,11 @@ class AboutSyncHeader extends React.Component {
   }
   render() {
     return (
-      <div className="header">
-        <div>
+      <div className="topHeader" >
+        <div className="topHeaderItem">
           {this.renderAccountInfo()}
         </div>
-        <div>
+        <div className="topHeaderItem">
           <p className="section-heading">Options</p>
           <div>
             {this.props.ready && <ConfigComponent/>}
@@ -110,7 +110,7 @@ class AboutSyncComponent extends React.Component {
   render() {
     let loginState = this.state.ready ? String(this.state.loggedIn) : "unknown";
     return (
-      <div>
+      <div className="mainContainer">
         <div hidden={this.state.ready}>
           <Fetching label="Fetching account..."/>
         </div>

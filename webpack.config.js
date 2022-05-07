@@ -7,6 +7,7 @@ module.exports = {
   resolve: {
     extensions: [".js", ".jsx"]
   },
+  devtool: false,
   module: {
     rules: [
       {

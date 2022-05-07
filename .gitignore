@@ -1,3 +1,4 @@
 node_modules
 data/build.js*
 web-ext-artifacts
+.DS_Store

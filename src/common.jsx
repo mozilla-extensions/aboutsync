@@ -58,14 +58,16 @@ function aboutSyncNodeRenderer({ depth, name, data, isNonenumerable, expanded })
 // Wrapper around ReactInspector.ObjectInspector that sets some common props
 function ObjectInspector(props) {
   // We let React do the defaulting for us using defaultProps.
-  return <ReactInspector.ObjectInspector {...props}/>;
+  const darkThemeMq = window.matchMedia("(prefers-color-scheme: dark)");
+  let theme = darkThemeMq.matches ? "chromeDark" : "chromeLight";
+  return <ReactInspector.ObjectInspector theme={theme} {...props}/>;
 }
 
 ObjectInspector.defaultProps = {
-  // This lib isn't styled with CSS, so we have to go through this (the default
+    // This lib isn't styled with CSS, so we have to go through this (the default
   // background is white, which looks bad).
   theme: Object.assign({}, ReactInspector.chromeLight, {
-    BASE_BACKGROUND_COLOR: "transparent"
+    BASE_BACKGROUND_COLOR: "any"
   }),
   nodeRenderer: aboutSyncNodeRenderer
 };

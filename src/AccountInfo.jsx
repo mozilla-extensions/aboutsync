@@ -1,28 +1,25 @@
-const React = require("react");
+import React, { useState, useEffect } from 'react'
 const { Fetching, ObjectInspector, ErrorDisplay, requireJSM } = require("./common");
 
-class AccountInfo extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { user: null };
-  }
+export default function AccountInfo(props) {
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
 
-  componentDidMount() {
-    this.updateState().catch(error => {
-      this.setState({ error });
+  const updateUser = async () => {
+    let user = await props.fxAccounts.getSignedInUser().catch(error => {
+      setError(error);
     });
-  }
+    setUser(user);
+  };
 
-  async updateState() {
-    let user = await this.props.fxAccounts.getSignedInUser();
-    this.setState({ user });
-  }
+  useEffect(() => {
+    updateUser();
+  }, []);
 
-  render() {
-    let user = this.state.user;
-    if (!user) {
-      return <Fetching label="Fetching account info..."/>;
-    }
+  console.log("rendering account info");
+  if (!user) {
+    return <Fetching label="Fetching account info..."/>;
+  }
     return (
       <div>
         <div className="profileContainer">
@@ -37,11 +34,8 @@ class AccountInfo extends React.Component {
         <ObjectInspector name="Full Profile"
                          data={user}
                          expandLevel={0}/>
-        <ErrorDisplay error={this.state.error}
-                      onClose={() => this.setState({error: null})}/>
+        {error && <ErrorDisplay error={error}
+                      onClose={() => setError(null)}/>}
       </div>
     );
-  }
-}
-
-module.exports = { AccountInfo };
+};
