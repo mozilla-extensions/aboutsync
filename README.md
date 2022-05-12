@@ -25,7 +25,7 @@ set `extensions.experiments.enabled=true`.
   console. Most non-bootstrap code can just use `console.log()` etc.
 
 # Testing a XPI
-The CI process creates "dev signed" XPI files which can be used to test - this is useful to test
+The CI process creates "dep signed" XPI files which can be used to test - this is useful to test
 the artifact of a PR, or to pre-test a release XPI before final "production signing".
 
 See [the official docs](https://github.com/mozilla-extensions/xpi-manifest/blob/master/docs/testing-a-xpi.md)
@@ -36,6 +36,29 @@ but a tl;dr is:
 * As with running from source, you *also need* `extensions.experiments.enabled=true`
 
 # Release Process
+Because this addon must be signed by the addons team, the release process is
+more difficult than for regular addons.
 
-Because this addon must be signed by the addons team, we follow the process
-[documented here](https://github.com/mozilla-extensions/xpi-manifest/blob/master/docs/releasing-a-xpi.md)
+The general process followed by the addons team is
+[documented here](https://github.com/mozilla-extensions/xpi-manifest/blob/master/docs/releasing-a-xpi.md),
+but at the current time, the maintainers of about-sync don't have the required
+permissions. Therefore, the process is:
+
+* Get everything ready for the new release. Note that the addon version inside
+  manifest.json is not used by this process, so it's not strictly necessary
+  to bump it.
+
+* Ensure this revision is tested using the [testing process described above](#testing-a-xpi)
+
+* Join the #addons-pipeline slack channel, asking for a release to be built
+  specifying the git revision - this will typically be `main`.
+
+* You should be given the link to a "release signing" taskcluster job - in this
+  job, look for the built, signed .xpi and download it locally.
+
+* This release signing task should also have created a github tag in the
+  [aboutsync repository](https://github.com/mozilla-extensions/aboutsync/tags).
+  Check that it has!
+
+* Upload the xpi to addons.mozilla.org. If you don't have the permission for
+  this, ask for help in the #addons-pipeline channel.
