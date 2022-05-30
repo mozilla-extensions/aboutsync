@@ -9,7 +9,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 const INDEX_HTML = "chrome://aboutsync/content/index.html";
 
-const generateQI = XPCOMUtils.generateQI || ChromeUtils.generateQI;
+const generateQI = ChromeUtils.generateQI;
 
 const AboutSyncRedirector = {
   QueryInterface: generateQI([Ci.nsIAboutModule]),
@@ -29,10 +29,10 @@ const AboutSyncRedirector = {
     return channel;
   },
 
-  createInstance(outer, iid) {
-    if (outer) {
-      throw Components.results.NS_ERROR_NO_AGGREGATION;
-    }
+  createInstance(p1, p2) {
+    // Pre Firefox 102, this signature was `createInstance(outer, iid)`
+    // In 102 (bug 1514936) it became `createInstance(iid)`.
+    let iid = "NS_ERROR_NO_AGGREGATION" in Components.results ? p2 : p1;
     return this.QueryInterface(iid);
   },
 
