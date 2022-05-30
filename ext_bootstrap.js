@@ -165,7 +165,7 @@ function shutdown(data, reason) {
   log("extension is shutting down");
 
   // Stop registering about:sync in new processes.
-  Services.ppmm.removeDelayedProcessScript(DATA_URI_REGISTER_ABOUT);
+  Services.ppmm.removeDelayedProcessScript("chrome://aboutsync/content/RegisterRedirector.js");
   // And unregister about:sync in any processes we've already loaded in.
   Services.ppmm.loadProcessScript("chrome://aboutsync/content/UnregisterRedirector.js", true);
 
