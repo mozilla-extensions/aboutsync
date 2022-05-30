@@ -2,8 +2,11 @@
   "description": "Show information about Firefox Sync.",
   "manifest_version": 2,
   "name": "About Sync",
-  "version": "0.0.60",
+  "version": "0.0.0",
   "homepage_url": "https://github.com/mozilla-extensions/aboutsync",
+  "permissions": [
+    "mozillaAddons"
+  ],
 
   "applications": {
     "gecko": {
