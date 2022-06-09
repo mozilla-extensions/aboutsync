@@ -85,6 +85,7 @@ class ErrorDisplay extends React.Component {
       onClose: PropTypes.func,
       prefix: PropTypes.string,
       formatError: PropTypes.func,
+      stack: PropTypes.func,
       error: PropTypes.any,
     };
   }
@@ -93,6 +94,7 @@ class ErrorDisplay extends React.Component {
     return {
       prefix: "Error: ",
       formatError: ErrorDisplay.defaultFormatter,
+      stack: ErrorDisplay.stack
     };
   }
 
@@ -111,6 +113,9 @@ class ErrorDisplay extends React.Component {
           {this.props.prefix}
           {this.props.formatError(this.props.error)}
         </p>
+        <pre>
+          {this.props.stack(this.props.error)}
+        </pre>
       </div>
     );
   }
@@ -124,6 +129,13 @@ class ErrorDisplay extends React.Component {
       return <ObjectInspector name="Error" data={result}/>
     }
     return result;
+  }
+
+  static stack(err) {
+    if (err && err.stack) {
+      return err.stack;
+    }
+    return "<no stack available>";
   }
 }
 

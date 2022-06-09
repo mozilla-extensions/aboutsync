@@ -10,12 +10,14 @@ const { CollectionsViewer } = require("./CollectionsViewer");
 const { ErrorDisplay, Fetching, importLocal } = require("./common");
 
 const { Services } = importLocal("resource://gre/modules/Services.jsm");
-const { fxAccounts } = importLocal("resource://gre/modules/FxAccounts.jsm");
 const { Weave } = importLocal("resource://services-sync/main.js");
 
 const weaveService = Cc["@mozilla.org/weave/service;1"]
                      .getService(Ci.nsISupports)
                      .wrappedJSObject;
+
+const { getFxAccountsSingleton } = importLocal("resource://gre/modules/FxAccounts.jsm");
+const fxAccounts = getFxAccountsSingleton();
 
 // Returns a promise that resolves when Sync is ready and logged in.
 function whenSyncReady() {
@@ -97,6 +99,7 @@ class AboutSyncComponent extends React.Component {
         provider: ProviderState.newProvider(),
       });
     }).catch(e => {
+      console.error("Failed to load initial state", e);
       this.setState({error: e})
     })
   }
@@ -109,6 +112,13 @@ class AboutSyncComponent extends React.Component {
 
   render() {
     let loginState = this.state.ready ? String(this.state.loggedIn) : "unknown";
+    if (this.state && this.state.error) {
+      return (
+        <ErrorDisplay error={this.state.error}
+                      prefix="Failed to initialize"/>
+      );
+    }
+
     return (
       <div className="mainContainer">
         <div hidden={this.state.ready}>

@@ -93,7 +93,8 @@ const collectionComponentBuilders = {
   },
 
   async clients(provider, serverRecords) {
-    const fxAccounts = importLocal("resource://gre/modules/FxAccounts.jsm").fxAccounts;
+    const { getFxAccountsSingleton } = importLocal("resource://gre/modules/FxAccounts.jsm");
+    const fxAccounts = getFxAccountsSingleton();
     let fxaDevices = [];
     if (typeof fxAccounts.device == "object" && "recentDeviceList" in fxAccounts.device) {
       // Force a refresh of the device list, so that we always show the most
