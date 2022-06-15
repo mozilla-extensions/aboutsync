@@ -53,8 +53,14 @@ permissions. Therefore, the process is:
 * Join the #addons-pipeline slack channel, asking for a release to be built
   specifying the git revision - this will typically be `main`.
 
-* You should be given the link to a "release signing" taskcluster job - in this
-  job, look for the built, signed .xpi and download it locally.
+* You will be notified of an initial build, with will include a "dep-signing"
+  task - however, this doesn't create the .xpi you can submit to AMO. Two
+  additional sign-offs from the addons team is necessary and you will be given
+  another taskcluster link.
+
+* In this second taskcluster build, you should find a link to a "release
+  signing" taskcluster job, look for the built, signed .xpi and download it
+  locally.
 
 * This release signing task should also have created a github tag in the
   [aboutsync repository](https://github.com/mozilla-extensions/aboutsync/tags).
