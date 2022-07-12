@@ -1,4 +1,7 @@
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
+const Services =
+  globalThis.Services ||
+  Cu.import("resource://gre/modules/Services.jsm").Services;
 
 const React = require("react");
 const ReactDOM = require("react-dom");
@@ -9,7 +12,6 @@ const { ProviderState, ProviderInfo } = require("./provider");
 const { CollectionsViewer } = require("./CollectionsViewer");
 const { ErrorDisplay, Fetching, importLocal } = require("./common");
 
-const { Services } = importLocal("resource://gre/modules/Services.jsm");
 const { Weave } = importLocal("resource://services-sync/main.js");
 
 const weaveService = Cc["@mozilla.org/weave/service;1"]

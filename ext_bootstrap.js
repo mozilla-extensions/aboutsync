@@ -1,7 +1,9 @@
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
+const Services =
+  globalThis.Services ||
+  Cu.import("resource://gre/modules/Services.jsm").Services;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/AddonManager.jsm");
 Cu.import("resource://gre/modules/Preferences.jsm");
 const WeaveConstants = Cu.import("resource://services-sync/constants.js", {});

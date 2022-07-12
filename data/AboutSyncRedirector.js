@@ -5,7 +5,9 @@ this.EXPORTED_SYMBOLS = ["AboutSyncRedirector"];
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://gre/modules/Services.jsm");
+const Services =
+  globalThis.Services ||
+  Cu.import("resource://gre/modules/Services.jsm").Services;
 
 const INDEX_HTML = "chrome://aboutsync/content/index.html";
 

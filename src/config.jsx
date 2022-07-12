@@ -6,12 +6,14 @@ const { Fetching, InternalAnchor, importLocal } = require("./common");
 
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
+const Services =
+  globalThis.Services ||
+  Cu.import("resource://gre/modules/Services.jsm").Services;
 const { Log } = importLocal("resource://gre/modules/Log.jsm");
 const { Preferences } = importLocal("resource://gre/modules/Preferences.jsm");
 const { FileUtils } = importLocal("resource://gre/modules/FileUtils.jsm");
 const { OS } = importLocal("resource://gre/modules/osfile.jsm");
 const { Downloads } = importLocal("resource://gre/modules/Downloads.jsm");
-const { Services } = importLocal("resource://gre/modules/Services.jsm");
 const { Config } = importLocal("chrome://aboutsync/content/config.js");
 const { Panel, PanelGroup } = require("./panel");
 const { Weave } = importLocal("resource://services-sync/main.js");

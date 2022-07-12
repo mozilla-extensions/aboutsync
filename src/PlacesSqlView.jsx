@@ -1,10 +1,13 @@
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
+const Services =
+  globalThis.Services ||
+  Cu.import("resource://gre/modules/Services.jsm").Services;
+
 const React = require("react");
 
 const { ErrorDisplay, valueLookupTable, importLocal } = require("./common");
 const { TableInspector } = require("./AboutSyncTableInspector");
 
-const { Services } = importLocal("resource://gre/modules/Services.jsm");
 const { PlacesUtils } = importLocal("resource://gre/modules/PlacesUtils.jsm");
 
 const sqlQueryPref = "extensions.aboutsync.lastQuery";

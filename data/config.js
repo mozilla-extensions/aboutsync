@@ -7,7 +7,9 @@
 
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-const { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
+const Services =
+  globalThis.Services ||
+  Cu.import("resource://gre/modules/Services.jsm").Services;
 const { Preferences } = Cu.import("resource://gre/modules/Preferences.jsm", {});
 const { XPCOMUtils } = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
