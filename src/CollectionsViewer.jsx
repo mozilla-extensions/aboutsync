@@ -14,6 +14,7 @@ const { PlacesSqlView, promiseSql } = require("./PlacesSqlView");
 const { BookmarkValidator } = require("./bookmarkValidator");
 
 const validation = require("./validation");
+const {default: DynamicTableView} = require("./components/DynamicTableView");
 
 const { Weave } = importLocal("resource://services-sync/main.js");
 const { AddonValidator } = importLocal("resource://services-sync/engines/addons.js");
@@ -260,7 +261,7 @@ class CollectionViewer extends React.Component {
         </TabPanel>
 
         <TabPanel name="Records (table)" key="records-table">
-          <TableInspector data={this.state.records}/>
+          <DynamicTableView data={this.state.records} />
         </TabPanel>
 
         <TabPanel name="Records (object)" key="records-object">
