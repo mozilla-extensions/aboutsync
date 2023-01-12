@@ -68,7 +68,6 @@ export default function DynamicTableView(props) {
             id: key,
             cell: (info) => {
               const { row, getValue } = info;
-              console.log("info: ", info);
               return detectIsExpandableColumn(info) ? (
                 <div>
                   <button
@@ -300,7 +299,6 @@ function DebouncedInput({
 }
 
 const renderSubComponent = ({ row }) => {
-  console.log("rendering subrow: ", row);
   return (
     <pre style={{ fontSize: "12px" }}>
       <ObjectInspector data={row.originalSubRows} expandLevel={2} />
