@@ -14,6 +14,14 @@ import {
 } from "@tanstack/react-table";
 import { ObjectInspector } from "react-inspector";
 
+const columnsWithSubRows = [
+  "parent",
+  "value",
+  "collections",
+  "engines",
+  "httpRealm",
+];
+
 // styled-components allow us to create smaller customizable components
 const StyledTable = styled.table`
   tbody tr {
@@ -61,7 +69,7 @@ export default function DynamicTableView(props) {
               }
               // Objects can't just be displayed by default in react, so stringify it and truncate it
               if (typeof row[key] === "object") {
-                return `${stringify(row[key]).substring(0, 24)}...`;
+                return "Click to exapnd";
               }
               return row[key];
             },
@@ -106,9 +114,15 @@ export default function DynamicTableView(props) {
       if (row.tabs) {
         return row.tabs;
       }
-      if (row.parent) {
-        return [row.parent];
+
+      // If the row in question has an object we return it
+      // to be rendered by the subcomponent
+      for (const key of columnsWithSubRows) {
+        if (row[key]) {
+          return [row[key]];
+        }
       }
+      return [];
     },
     renderSubComponent,
     onColumnFiltersChange: setColumnFilters,
@@ -308,7 +322,10 @@ const renderSubComponent = ({ row }) => {
 
 function detectIsExpandableColumn(info) {
   // XXX - just do this manually until we find a better way
-  if (info.column.id === "tabs" || info.column.id === "parent") {
+  if (
+    info.column.id === "tabs" ||
+    columnsWithSubRows.includes(info.column.id)
+  ) {
     return true;
   }
   return false;
