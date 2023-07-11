@@ -10,13 +10,13 @@ Once installed, type `about:sync` into the URL bar.
 
 # Running from source
 This is only possible in Nightly. To proceed, you must use `about:config` to
-set `extensions.experiments.enabled=true`.
+set `extensions.experiments.enabled=true` and `xpinstall.signatures.required=false`.
 * Clone the git repo locally.
 * Run `npm install` inside the repo.
 * Optionally, run `npm run dev` which should start a daemon which means any edits you
   make while Firefox is running should get picked up, and only need a "refresh" rather
   than a full browser restart to be seen.
-* In `about:debugging`, load the extension by selecting any file in the root directory (eg, `chrome.manifest`).
+* Visit `about:debugging` -> "This Nightly" -> "Load Temporary Addon", then select  any file in the root directory (eg, `chrome.manifest`).
 * Open `about:sync`
 
 ## Other help:
