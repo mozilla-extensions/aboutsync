@@ -233,8 +233,7 @@ class AboutSyncRecordEditor extends React.Component {
         </div>
         <ErrorDisplay error={this.state.error}
                       onClose={() => this.setState({error: null})}
-                      prefix="Error: "
-                      formatError={e => this.renderErrorMsg(e)}/>
+                      prefix="Error: "/>
         {this.state.error && (
           <div className="error-message">
             <button className="close-error"
