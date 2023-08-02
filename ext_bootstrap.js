@@ -87,9 +87,9 @@ function shouldReportError(data) {
     return true;
   }
 
-  let lastSync = Weave.Svc.Prefs.get("lastSync");
+  let lastSync = Services.prefs.getIntPref("services.sync.lastSync");
   if (lastSync && ((Date.now() - Date.parse(lastSync)) >
-      Weave.Svc.Prefs.get("errorhandler.networkFailureReportTimeout") * 1000)) {
+      Services.prefs.getIntPref("services.sync.errorhandler.networkFailureReportTimeout") * 1000)) {
     return true;
   }
 
