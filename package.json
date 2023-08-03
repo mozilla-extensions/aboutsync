@@ -1,7 +1,7 @@
 {
   "name": "aboutsync",
   "private": true,
-  "version": "0.21.2",
+  "version": "0.22.0",
   "description": "About Sync Firefox addon",
   "scripts": {
     "build": "webpack --mode=production && web-ext build",
