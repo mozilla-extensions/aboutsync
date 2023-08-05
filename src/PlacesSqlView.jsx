@@ -1,14 +1,9 @@
-const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
-const Services =
-  globalThis.Services ||
-  Cu.import("resource://gre/modules/Services.jsm").Services;
-
 const React = require("react");
 
-const { ErrorDisplay, valueLookupTable, importLocal } = require("./common");
+const { ErrorDisplay, valueLookupTable } = require("./common");
 const { TableInspector } = require("./AboutSyncTableInspector");
 
-const { PlacesUtils } = importLocal("resource://gre/modules/PlacesUtils.jsm");
+const { PlacesUtils } = ChromeUtils.importESModule("resource://gre/modules/PlacesUtils.sys.mjs");
 
 const sqlQueryPref = "extensions.aboutsync.lastQuery";
 

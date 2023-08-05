@@ -1,19 +1,12 @@
 "use strict";
 // Providers for the data used by the addon.
 // Data can be provided by Sync itself, or by a JSON file.
-
-const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
-const Services =
-  globalThis.Services ||
-  Cu.import("resource://gre/modules/Services.jsm").Services;
-
-const { importLocal } = require("./common");
 const { PrefCheckbox } = require("./config");
 
-const { Weave } = importLocal("resource://services-sync/main.js");
+const { Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.mjs");
 
-const { CryptoWrapper, Collection } = importLocal("resource://services-sync/record.js");
-const { PlacesUtils } = importLocal("resource://gre/modules/PlacesUtils.jsm");
+const { CryptoWrapper, Collection } = ChromeUtils.importESModule("resource://services-sync/record.sys.mjs");
+const { PlacesUtils } = ChromeUtils.importESModule("resource://gre/modules/PlacesUtils.sys.mjs");
 
 const React = require("react");
 

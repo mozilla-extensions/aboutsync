@@ -11,9 +11,6 @@
 
 "use strict";
 
-const { XPCOMUtils } = ChromeUtils.import(
-  "resource://gre/modules/XPCOMUtils.jsm"
-);
 const { CommonUtils } = ChromeUtils.import(
   "resource://services-common/utils.js"
 );
@@ -241,7 +238,7 @@ class BookmarkProblemData {
 }
 
 // Defined lazily to avoid initializing PlacesUtils.bookmarks too soon.
-XPCOMUtils.defineLazyGetter(lazy, "SYNCED_ROOTS", () => [
+ChromeUtils.defineLazyGetter(lazy, "SYNCED_ROOTS", () => [
   lazy.PlacesUtils.bookmarks.menuGuid,
   lazy.PlacesUtils.bookmarks.toolbarGuid,
   lazy.PlacesUtils.bookmarks.unfiledGuid,
@@ -252,7 +249,7 @@ XPCOMUtils.defineLazyGetter(lazy, "SYNCED_ROOTS", () => [
 // toolkit/components/places/nsNavHistoryQuery.cpp. We follow queries that
 // reference existing folders in the client tree, and detect cycles where a
 // query references its containing folder.
-XPCOMUtils.defineLazyGetter(lazy, "ROOT_GUID_TO_QUERY_FOLDER_NAME", () => ({
+ChromeUtils.defineLazyGetter(lazy, "ROOT_GUID_TO_QUERY_FOLDER_NAME", () => ({
   [lazy.PlacesUtils.bookmarks.rootGuid]: "PLACES_ROOT",
   [lazy.PlacesUtils.bookmarks.menuGuid]: "BOOKMARKS_MENU",
 

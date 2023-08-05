@@ -1,20 +1,7 @@
-"use strict";
-
-this.EXPORTED_SYMBOLS = ["AboutSyncRedirector"];
-
-const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
-
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-const Services =
-  globalThis.Services ||
-  Cu.import("resource://gre/modules/Services.jsm").Services;
-
 const INDEX_HTML = "chrome://aboutsync/content/index.html";
 
-const generateQI = ChromeUtils.generateQI;
-
-const AboutSyncRedirector = {
-  QueryInterface: generateQI([Ci.nsIAboutModule]),
+export let AboutSyncRedirector = {
+  QueryInterface: ChromeUtils.generateQI([Ci.nsIAboutModule]),
   classID: Components.ID("{decc7a05-f6c6-4624-9e58-176c84d032af}"),
 
   getURIFlags() {
@@ -50,4 +37,3 @@ const AboutSyncRedirector = {
       .unregisterFactory(this.classID, this);
   }
 };
-

@@ -1,18 +1,9 @@
-const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
-
-const Services =
-  globalThis.Services ||
-  Cu.import("resource://gre/modules/Services.jsm").Services;
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://gre/modules/AddonManager.jsm");
-Cu.import("resource://gre/modules/Preferences.jsm");
-const WeaveConstants = Cu.import("resource://services-sync/constants.js", {});
-Cu.import("resource://gre/modules/Log.jsm");
-Cu.import("resource://services-sync/main.js");
-
+const { Log } = ChromeUtils.importESModule("resource://gre/modules/Log.sys.mjs");
+const { Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.mjs");
+const WeaveConstants = ChromeUtils.importESModule("resource://services-sync/constants.sys.mjs");
+const { XPCOMUtils } = ChromeUtils.importESModule("resource://gre/modules/XPCOMUtils.sys.mjs");
 if (typeof console !== "object") {
-  XPCOMUtils.defineLazyModuleGetter(this, "console",
-                                    "resource://gre/modules/Console.jsm");
+  var { console  } = ChromeUtils.importESModule("resource://gre/modules/Console.sys.mjs");
 }
 
 XPCOMUtils.defineLazyServiceGetter(this, "AlertsService", "@mozilla.org/alerts-service;1", "nsIAlertsService");
@@ -151,7 +142,7 @@ function startup(data, reason) {
 
   // for some reason we can't use chrome://aboutsync at the top-level of
   // this module, but only after startup is called.
-  const { Config } = Cu.import("chrome://aboutsync/content/config.js", {});
+  const { Config } = ChromeUtils.importESModule("chrome://aboutsync/content/config.js");
   Config.initialize();
 }
 

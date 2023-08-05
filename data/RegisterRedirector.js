@@ -1,2 +1,2 @@
-Components.utils.import("chrome://aboutsync/content/AboutSyncRedirector.js");
+const { AboutSyncRedirector } = ChromeUtils.importESModule("chrome://aboutsync/content/AboutSyncRedirector.js");
 AboutSyncRedirector.register();

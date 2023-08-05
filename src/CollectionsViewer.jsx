@@ -1,5 +1,3 @@
-const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
-
 const React = require("react");
 const { TabView, TabPanel } = require("./TabView");
 
@@ -319,7 +317,6 @@ class CollectionsViewer extends React.Component {
       return;
     }
     provider.promiseCollectionInfo().then(info => {
-      console.log("Got info: ", info);
       this.setState({ info, error: null });
     }).catch(err => {
       console.error("Collection viewer failed", err);

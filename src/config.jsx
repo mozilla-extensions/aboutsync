@@ -2,18 +2,13 @@
 // offered by this addon.
 
 const React = require("react");
-const { Fetching, InternalAnchor, importLocal } = require("./common");
+const { Fetching, InternalAnchor } = require("./common");
 
-const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
-
-const Services =
-  globalThis.Services ||
-  Cu.import("resource://gre/modules/Services.sys.mjs").Services;
 const { Log } = ChromeUtils.importESModule("resource://gre/modules/Log.sys.mjs");
 const { Preferences } = ChromeUtils.importESModule("resource://gre/modules/Preferences.sys.mjs");
 const { FileUtils } = ChromeUtils.importESModule("resource://gre/modules/FileUtils.sys.mjs");
-const { Downloads } = importLocal("resource://gre/modules/Downloads.jsm");
-const { Config } = importLocal("chrome://aboutsync/content/config.js");
+const { Downloads } = ChromeUtils.importESModule("resource://gre/modules/Downloads.sys.mjs");
+const { Config } = ChromeUtils.importESModule("chrome://aboutsync/content/config.js");
 const { Panel, PanelGroup } = require("./panel");
 const { Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.mjs");
 

@@ -18,11 +18,12 @@ this.aboutsync = class extends ExtensionAPI {
               Services.scriptSecurityManager.getSystemPrincipal(),
               {
                 sandboxName: `sandbox for about:sync's implementation`,
+                wantGlobalProperties: ["ChromeUtils"],
               }
             );
             script.executeInGlobal(ns);
             try {
-              ns.startup({context}, null);
+              ns.AboutSyncBootstrap.startup({context}, null);
             } catch (ex) {
               console.error("FAILED to initialize", ex);
               // but we continue to add the closer function so we can

@@ -1,5 +1,3 @@
-const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
-
 const React = require("react");
 const { ObjectInspector } = require("./common");
 const { TableInspector } = require("./AboutSyncTableInspector");

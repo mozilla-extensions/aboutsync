@@ -1,21 +1,10 @@
-"use strict";
-
 // Helpers for the config component.
 
 // This is a bit of a special module in that it's imported both by bootstrap.js
 // and by the react-based UI code, and we also want it to be a singleton.
-
-const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
-
-const Services =
-  globalThis.Services ||
-  Cu.import("resource://gre/modules/Services.jsm").Services;
-const { Preferences } = Cu.import("resource://gre/modules/Preferences.jsm", {});
-const { XPCOMUtils } = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
-
+const { Preferences } = ChromeUtils.importESModule("resource://gre/modules/Preferences.sys.mjs");
 if (typeof console !== "object") {
-  XPCOMUtils.defineLazyModuleGetter(this, "console",
-                                    "resource://gre/modules/Console.jsm");
+  var { console  } = ChromeUtils.importESModule("resource://gre/modules/Console.sys.mjs");
 }
 
 function fixDesc(desc) {
@@ -152,8 +141,10 @@ function finalize() {
   }
 }
 
-
-this.Config = {getCurrentUserType, getUserTypes, changeUserType,
-               initialize, finalize};
-
-this.EXPORTED_SYMBOLS = ["Config"];
+export let Config = {
+  getCurrentUserType,
+  getUserTypes,
+  changeUserType,
+  initialize,
+  finalize
+};

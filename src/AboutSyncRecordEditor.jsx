@@ -1,8 +1,8 @@
 "use strict";
 const React = require("react");
 const PropTypes = require("prop-types");
-const { ErrorDisplay, importLocal } = require("./common");
-const { Utils } = importLocal("resource://services-sync/util.js");
+const { ErrorDisplay } = require("./common");
+const { Utils } = ChromeUtils.importESModule("resource://services-sync/util.sys.mjs");
 
 function shortenText(x, maxLen) {
   return x.length >= maxLen ? x.slice(0, maxLen - 1) + "…" : x;

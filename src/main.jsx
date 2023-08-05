@@ -1,24 +1,19 @@
-const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
-const Services =
-  globalThis.Services ||
-  Cu.import("resource://gre/modules/Services.jsm").Services;
-
 const React = require("react");
 import { createRoot } from "react-dom/client";
 import AccountInfo from "./AccountInfo";
 const { ConfigComponent } = require("./config");
 const { ProviderState, ProviderInfo } = require("./provider");
 const { CollectionsViewer } = require("./CollectionsViewer");
-const { ErrorDisplay, Fetching, importLocal } = require("./common");
+const { ErrorDisplay, Fetching } = require("./common");
 
-const { Weave } = importLocal("resource://services-sync/main.js");
+const { Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.mjs");
 
 const weaveService = Cc["@mozilla.org/weave/service;1"]
                      .getService(Ci.nsISupports)
                      .wrappedJSObject;
 
-const { fxAccounts: legacyfxAccounts, getFxAccountsSingleton } = importLocal("resource://gre/modules/FxAccounts.jsm");
-const fxAccounts = legacyfxAccounts || getFxAccountsSingleton();
+const { getFxAccountsSingleton } = ChromeUtils.importESModule("resource://gre/modules/FxAccounts.sys.mjs");
+const fxAccounts = getFxAccountsSingleton();
 
 // Returns a promise that resolves when Sync is ready and logged in.
 function whenSyncReady() {
