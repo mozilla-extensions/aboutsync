@@ -216,26 +216,28 @@ class CollectionViewer extends React.Component {
       totalRecords = this.props.fullInfo.collectionCounts[this.props.info.name];
     }
     let lastModified = new Date(this.props.info.lastModified);
-    let numDeleted = this.state.records.filter(r => r && r.deleted).length;
-    let numNull = this.state.records.filter(r => !r).length;
     let fetchingAdditional = this.state.hasAdditional && !this.state.additional;
+    // extra bits of info worth sharing
+    let extras = [];
+    let numDeleted = this.state.records.filter(r => r && r.deleted).length;
+    if (numDeleted) {
+      extras.push(`${numDeleted} deleted`);
+    }
+    // sounds bad, never seen it before, but someone must have, so...
+    let numNull = this.state.records.filter(r => !r).length;
+    if (numNull) {
+      extras.push(`${numNull} null payloads!`);
+    }
+    if (this.state.records.length != totalRecords) {
+      extras.push(`${totalRecords} total`);
+    }
+    let infos = extras.length ? ` (${extras.join(", ")})` : "";
+
     return (
       <div>
         <p className="collectionSummary">
-          {this.state.records.length == totalRecords ? (
-            `Downloaded all ${this.state.records.length} records (${numDeleted} deleted)`
-          ) : (
-            `Downloaded ${this.state.records.length} out of ${totalRecords} records (saw ${numDeleted} deleted)`
-          )}
+          {this.state.records.length} records{infos}, modified {lastModified.toString()}
         </p>
-        <p className="collectionSummary">
-          from {this.props.info.url}, last modified at {lastModified.toString()}
-        </p>
-        {numNull > 0 && (
-          <div className="error-message">
-            <p>Collection contains {numNull} null payloads!</p>
-          </div>
-        )}
         {fetchingAdditional && <Fetching label="Building additional info..."/>}
       </div>
     );
@@ -245,14 +247,13 @@ class CollectionViewer extends React.Component {
     let engine = this.props.info.name == "clients" ?
                  Weave.Service.clientsEngine :
                  Weave.Service.engineManager.get(this.props.info.name);
+    //auto-expand collections with few records
+    let recordsExpandLevel = this.state.records.length < 20 ? 2 : 1;
     return (
       <TabView>
         <TabPanel name="Summary" key="summary">
           {this.renderSummary()}
-        </TabPanel>
-
-        <TabPanel name="Response" key="response">
-          <ObjectInspector name="Response" data={this.state.response} expandLevel={1}/>
+          <ObjectInspector name="Response" data={this.state.response} expandLevel={0}/>
         </TabPanel>
 
         <TabPanel name="Records (table)" key="records-table">
@@ -260,7 +261,7 @@ class CollectionViewer extends React.Component {
         </TabPanel>
 
         <TabPanel name="Records (object)" key="records-object">
-          <ObjectInspector name="Records" data={this.state.records} expandLevel={1}/>
+          <ObjectInspector name="Records" data={this.state.records} expandLevel={recordsExpandLevel}/>
         </TabPanel>
 
         {this.props.provider.isLocal && engine && (
