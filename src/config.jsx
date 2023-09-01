@@ -184,33 +184,10 @@ class LogFilesComponent extends React.Component {
     };
   }
 
-  // Makes a simple .zip file and "downloads" it.
-  // NOTE that this could possibly be improved by concatenating all log files
-  // in "last modified" order into a single txt file, along with other
-  // diagnostic ifo, ready for upload into bugzilla - that would make it
-  // easier for the developer to peruse and get a complete picture of the session.
-
-  // Eg, I could see the file being of the form:
-  // ---- 8< ---- cut here ---- 8< ----
-  // [addons]
-  // { dynamically generated list of addons here. }
-  // [preferences]
-  // { dynamically generated list of about:troubleshooting preferences here. }
-  // ...
-  // [log logfilename]
-  // { contents of the first logfile }
-  // [log logfilename]
-  // etc.
-
-  // But for now it is just a simple .zip file of every log file we could find.
-  async downloadZipFile(event) {
-    event.preventDefault();
-    let logFilenames = [];
+  // Makes a simple .zip file with a single file in it.
+  async zipOneFile(zipFile, filename) {
     let zipWriter = Cc["@mozilla.org/zipwriter;1"].createInstance(Ci.nsIZipWriter);
 
-    // Create the file in ${TempDir}/mozilla-temp-files
-    let zipFile = FileUtils.getFile("TmpD",
-      ["mozilla-temp-files", "aboutsync-logfiles.zip"]);
     console.log("Creating zip", zipFile.path);
     // *sob*
     const PR_RDWR        = 0x04;
@@ -219,21 +196,12 @@ class LogFilesComponent extends React.Component {
 
     zipWriter.open(zipFile, PR_RDWR | PR_CREATE_FILE | PR_TRUNCATE);
 
-    for (let entry of this.state.logFiles.entries) {
-      let logfile = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
-      logfile.initWithPath(entry.path);
-      zipWriter.addEntryFile(logfile.leafName,
+    let file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
+    file.initWithPath(filename);
+    zipWriter.addEntryFile(file.leafName,
                              Ci.nsIZipWriter.COMPRESSION_DEFAULT,
-                             logfile, false);
-    }
+                             file, false);
     zipWriter.close();
-    // Now start the "download" of the file.
-    // This seems much more difficult than it should be!
-    try {
-      await this.downloadFile(Services.io.newFileURI(zipFile), "aboutsync-logfiles.zip");
-    } catch(err) {
-      console.error("Failed to download zipfile", err);
-    }
   }
 
   async downloadFile(sourceFileURI, targetFilename) {
@@ -272,7 +240,7 @@ class LogFilesComponent extends React.Component {
     });
   }
 
-  async _downloadCombined() {
+  async _makeCombined() {
     let files = this._getOrderedLogFiles();
     this.setState({
       downloadingCombined: {
@@ -342,16 +310,35 @@ class LogFilesComponent extends React.Component {
         total: files.length
       }
     });
-
-    await this.downloadFile(PathUtils.toFileURI(combinedFilePath), "aboutsync-combined-log.txt");
+    return combinedFilePath;
   }
 
-  async downloadCombined(event) {
+  async downloadCombinedAsText(event) {
     event.preventDefault();
     try {
-      await this._downloadCombined();
+      let filename = await this._makeCombined();
+      await this.downloadFile(PathUtils.toFileURI(filename), "aboutsync-combined-log.txt");
     } catch (e) {
       console.error("Failed to download combined", e);
+    }
+    this.setState({
+      downloadingCombined: null
+    });
+  }
+
+  async downloadCombinedAsZip(event) {
+    event.preventDefault();
+    try {
+      let filename = await this._makeCombined();
+
+      // Create the zip file in ${TempDir}/mozilla-temp-files
+      let dir = FileUtils.getDir("TmpD", ["mozilla-temp-files"]);
+      let zipFile = new FileUtils.File(PathUtils.join(dir.path,  "aboutsync-combined-log.zip"));
+      await this.zipOneFile(zipFile, filename)
+      // Now "download" it
+      await this.downloadFile(Services.io.newFileURI(zipFile), "aboutsync-combined-log.zip");
+    } catch(err) {
+      console.error("Failed to download zipfile", err);
     }
     this.setState({
       downloadingCombined: null
@@ -363,10 +350,35 @@ class LogFilesComponent extends React.Component {
     eh._log.info("about:sync flushing log file due to user request");
     eh.resetFileLog().catch(err => {
       console.error("Failed to flush the log", err);
+    }).then(() => {
+      this.reload();
     });
   }
 
+  removeAllLogs(event) {
+    const { logManager } = ChromeUtils.importESModule("resource://gre/modules/FxAccountsCommon.sys.mjs");
+    logManager.removeAllLogs().catch(err => {
+      console.error("Failed to flush the log", err);
+    }).then(() => {
+      let eh = Weave.Service.errorHandler;
+      eh._log.info("about:sync removed all logs due to user request");
+      this.reload();
+    });
+  }
+
+  writeCustomLogEntry(event) {
+    let text = window.prompt("Enter something to write to the log files");
+    if (text) {
+      let eh = Weave.Service.errorHandler;
+      eh._log.info(`about:sync custom log entry: ${text}`);
+    }
+  }
+
   async componentDidMount() {
+    this.reload();
+  }
+
+  async reload() {
     // find all our log-files.
     let logDir = FileUtils.getDir("ProfD", ["weave", "logs"]);
     let result = {
@@ -402,29 +414,43 @@ class LogFilesComponent extends React.Component {
     if (!logFiles) {
       return <Fetching label="Looking for log files..."/>;
     }
-    if (!logFiles.entries.length) {
-      return <span>No news is good news; there are no log files</span>;
-    }
-    // summarize them - by default, they will all be errors.
+
+    let logActions;
+    if (logFiles.entries.length == 0) {
+      logActions = <div><span>No news is good news; there are no log files</span></div>;
+    } else {
+      // summarize them - by default, they will all be errors.
+      logActions = <>
+        <div>
+          <span>{logFiles.numErrors} error logs, {logFiles.entries.length} in total - </span>
+          <InternalAnchor href="about:sync-log">view them locally</InternalAnchor>
+        </div>
+        <div>
+          {this.state.downloadingCombined ? (
+            <span>{this._processing("combined log file", this.state.downloadingCombined)}</span>
+          ) : (
+          <span>download a combined summary <a href="#" onClick={event => this.downloadCombinedAsText(event)}>as a text file</a> or <a href="#" onClick={event => this.downloadCombinedAsZip(event)}>as a zip file</a></span>
+          )}
+        </div>
+      </>
+    };
+
     return (
       <div>
-        <span>{logFiles.numErrors} error logs, {logFiles.entries.length} in total - </span>
-        <InternalAnchor href="about:sync-log">view them locally</InternalAnchor>
-        <span>, </span>
-        {this.state.downloadingCombined ? (
-          <span>{this._processing("combined log file", this.state.downloadingCombined)}</span>
-        ) : (
-          <a href="#" onClick={event => this.downloadCombined(event)}>
-            download a combined summary
-          </a>
-        )}
-        <span>, or </span>
-        <a href="#" onClick={event => this.downloadZipFile(event)}>
-          download them as a zip file
-        </a>
+        {logActions}
         <div>
           <button className="action-button" onClick={event => this.flushLog(event)}>
             Force a new (probably empty) log now
+          </button>
+        </div>
+        <div>
+          <button className="action-button" onClick={event => this.removeAllLogs(event)}>
+            Permanently remove all log files
+          </button>
+        </div>
+        <div>
+          <button className="action-button" onClick={event => this.writeCustomLogEntry(event)}>
+            Write a custom log entry
           </button>
         </div>
       </div>
