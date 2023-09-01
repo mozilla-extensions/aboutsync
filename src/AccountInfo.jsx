@@ -33,7 +33,7 @@ export default function AccountInfo(props) {
         </div>
         <ObjectInspector name="Full Profile"
                          data={user}
-                         expandLevel={0}/>
+                         expandLevel={1}/>
         {error && <ErrorDisplay error={error}
                       onClose={() => setError(null)}/>}
       </div>
