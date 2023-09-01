@@ -141,7 +141,7 @@ function finalize() {
   }
 }
 
-export let Config = {
+export const Config = {
   getCurrentUserType,
   getUserTypes,
   changeUserType,
