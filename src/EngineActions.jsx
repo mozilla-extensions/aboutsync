@@ -25,17 +25,47 @@ class EngineActions extends React.Component {
     });
   }
 
+  wipe(event) {
+    let e = this.props.engine;
+    e._log.info("about:sync wiping engine due to user request");
+    e.wipeServer().then(() => {
+      alert("Wipe complete");
+    }).catch(err => {
+      console.error("Failed to wipe the engine", err);
+    });
+  }
+
   render() {
+    let reset;
+    if (this.props.engine.resetClient) {
+      reset = 
+        <div>
+          <span>Resetting an engine clears all local state, so the next Sync will
+                act as though this was the first sync for that engine's data -
+                all records will be downloaded, compared against local records
+                and missing records uploaded - 
+          </span>
+          <button onClick={event => this.reset(event)}>Reset {this.props.engine.name}</button>
+        </div>
+    }
+    let canWipe = !["crypto", "meta"].includes(this.props.engine.name);
+    let wipe;
+    if (canWipe) {
+      wipe =
+        <div>
+          <span>Wiping an engine removes data from the server. <em>It does not remove local data</em>.
+                This device will upload all its data. Other devices will act like a <i>Reset</i>, as described above.
+                -
+          </span>
+          <button onClick={event => this.wipe(event)}>Wipe {this.props.engine.name}</button>
+        </div>
+    };
     return (
-      <div>
-        <span>Resetting an engine clears all local state, so the next Sync will
-              act as though this was the first sync for that engine's data - 
-              all records will be downloaded, compared against local records
-              and missing records uploaded - 
-        </span>
-        <button onClick={event => this.reset(event)}>Reset {this.props.engine.name}</button>
-      </div>
-    );
+      <>
+      { reset }
+      { wipe }
+    </>
+  );
   }
 }
 

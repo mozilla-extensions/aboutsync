@@ -273,7 +273,7 @@ class CollectionViewer extends React.Component {
           </TabPanel>
         )}
         {this.renderAdditionalTabs()}
-        {this.props.provider.isLocal && engine && engine.resetClient && (
+        {this.props.provider.isLocal && engine && (
           <TabPanel name="Engine Actions" key="actions">
             <EngineActions
               engine={engine}/>
