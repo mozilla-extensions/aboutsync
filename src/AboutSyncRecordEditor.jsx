@@ -3,6 +3,7 @@ const React = require("react");
 const PropTypes = require("prop-types");
 const { ErrorDisplay } = require("./common");
 const { Utils } = ChromeUtils.importESModule("resource://services-sync/util.sys.mjs");
+const { toast, toast_error } = require("./common");
 
 function shortenText(x, maxLen) {
   return x.length >= maxLen ? x.slice(0, maxLen - 1) + "…" : x;
@@ -75,7 +76,7 @@ class AboutSyncRecordEditor extends React.Component {
     try {
       await inner();
     } catch (e) {
-      console.error("Uncaught error: ", e);
+      toast_error("Uncaught error", e);
       this.setState({ error: "Unexpected error: " + e })
     } finally {
       this.setState({ requesting: false });
@@ -95,7 +96,7 @@ class AboutSyncRecordEditor extends React.Component {
     try {
       resp = await request();
     } catch (e) {
-      console.error("Error: ", e);
+      toast_error("Network Error", e);
       this.setState({ error: "Network error: " + e });
       return false;
     }
@@ -141,6 +142,7 @@ class AboutSyncRecordEditor extends React.Component {
       return;
     }
     console.log("Deleted id", toDelete);
+    toast("Deleted the record");
 
     let index = this.props.records.findIndex(r => r.id == toDelete);
     if (index >= 0) {
@@ -175,6 +177,7 @@ class AboutSyncRecordEditor extends React.Component {
       // Already updated error state.
       return;
     }
+    toast("Updated the record");
 
     // Update current record or add a new one.
     let recordIndex = this.props.records.findIndex(r => r.id == id);

@@ -7,6 +7,7 @@ const { Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.
 
 const { CryptoWrapper, Collection } = ChromeUtils.importESModule("resource://services-sync/record.sys.mjs");
 const { PlacesUtils } = ChromeUtils.importESModule("resource://gre/modules/PlacesUtils.sys.mjs");
+const { toast, toast_error } = require("./common");
 
 const React = require("react");
 
@@ -385,10 +386,9 @@ class ProviderInfo extends React.Component {
         if (result == nsIFilePicker.returnOK || result == nsIFilePicker.returnReplace) {
           let filename = fp.file.QueryInterface(Ci.nsIFile).path;
           this.props.provider.promiseExport(filename, this.state.anonymize).then(() => {
-            alert("File created");
+            toast("File created");
           }).catch(err => {
-            console.error("Failed to create file", err);
-            alert("Failed to create file: " + err);
+            toast_error("Failed to create file", err);
           });
         }
       }

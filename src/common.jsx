@@ -4,6 +4,7 @@
 const React = require("react");
 const ReactInspector = require("react-inspector");
 const PropTypes = require("prop-types");
+const { toast } = require('react-toastify');
 
 // A placeholder for when we are still fetching data.
 function Fetching({label}) {
@@ -169,6 +170,13 @@ async function arrayCloneWithoutJank(arr) {
   return result;
 }
 
+function toast_error(msg, err) {
+  console.log(msg, err);
+  let full = `${msg}: ${err}`;
+  let display = <div><p>{full}</p><p>(See the console for more details)</p></div>;
+  toast.error(display);
+}
+
 module.exports = {
   Fetching,
   InternalAnchor,
@@ -177,4 +185,6 @@ module.exports = {
   jankYielder,
   arrayCloneWithoutJank,
   valueLookupTable,
+  toast,
+  toast_error,
 };

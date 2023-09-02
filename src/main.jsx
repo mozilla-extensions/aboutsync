@@ -1,6 +1,8 @@
 const React = require("react");
 import { createRoot } from "react-dom/client";
 import AccountInfo from "./AccountInfo";
+const { ToastContainer } = require('react-toastify');
+import 'react-toastify/dist/ReactToastify.css';
 const { ConfigComponent } = require("./config");
 const { ProviderState, ProviderInfo } = require("./provider");
 const { CollectionsViewer } = require("./CollectionsViewer");
@@ -136,6 +138,10 @@ class AboutSyncComponent extends React.Component {
                           updateProvider={() => this.refreshProvider()}/>
           </div>
         )}
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+        />
       </div>
     );
   }

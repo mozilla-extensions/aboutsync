@@ -1,5 +1,6 @@
 "use strict";
 const React = require("react");
+const { toast, toast_error } = require('./common');
 const PropTypes = require("prop-types");
 
 class EngineActions extends React.Component {
@@ -19,9 +20,9 @@ class EngineActions extends React.Component {
     let e = this.props.engine;
     e._log.info("about:sync resetting engine due to user request");
     e.resetClient().then(() => {
-      alert("Reset complete");
+      toast("Reset complete");
     }).catch(err => {
-      console.error("Failed to reset the engine", err);
+      toast_error("Failed to reset the engine", err);
     });
   }
 
@@ -29,9 +30,9 @@ class EngineActions extends React.Component {
     let e = this.props.engine;
     e._log.info("about:sync wiping engine due to user request");
     e.wipeServer().then(() => {
-      alert("Wipe complete");
+      toast("Wipe complete");
     }).catch(err => {
-      console.error("Failed to wipe the engine", err);
+      toast_error("Failed to wipe the engine", err);
     });
   }
 

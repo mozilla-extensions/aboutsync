@@ -2,7 +2,7 @@
 // offered by this addon.
 
 const React = require("react");
-const { Fetching, InternalAnchor } = require("./common");
+const { Fetching, InternalAnchor, toast, toast_error } = require("./common");
 
 const { Log } = ChromeUtils.importESModule("resource://gre/modules/Log.sys.mjs");
 const { Preferences } = ChromeUtils.importESModule("resource://gre/modules/Preferences.sys.mjs");
@@ -302,7 +302,7 @@ class LogFilesComponent extends React.Component {
         await puts(outLines.join("\n"));
       }
     } catch (err) {
-      console.error("Error combining logs: ", err);
+      toast_error("Error combining logs", err);
     }
     this.setState({
       downloadingCombined: {
@@ -319,7 +319,7 @@ class LogFilesComponent extends React.Component {
       let filename = await this._makeCombined();
       await this.downloadFile(PathUtils.toFileURI(filename), "aboutsync-combined-log.txt");
     } catch (e) {
-      console.error("Failed to download combined", e);
+      toast_error("Failed to download combined", e);
     }
     this.setState({
       downloadingCombined: null
@@ -338,7 +338,7 @@ class LogFilesComponent extends React.Component {
       // Now "download" it
       await this.downloadFile(Services.io.newFileURI(zipFile), "aboutsync-combined-log.zip");
     } catch(err) {
-      console.error("Failed to download zipfile", err);
+      toast_error("Failed to download zipfile", err);
     }
     this.setState({
       downloadingCombined: null
@@ -348,21 +348,23 @@ class LogFilesComponent extends React.Component {
   flushLog(event) {
     let eh = Weave.Service.errorHandler;
     eh._log.info("about:sync flushing log file due to user request");
-    eh.resetFileLog().catch(err => {
-      console.error("Failed to flush the log", err);
-    }).then(() => {
+    eh.resetFileLog().then(() => {
+      toast("Flushed a new log file");
       this.reload();
+    }).catch(err => {
+      toast_error("Failed to flush the log", err);
     });
   }
 
   removeAllLogs(event) {
     const { logManager } = ChromeUtils.importESModule("resource://gre/modules/FxAccountsCommon.sys.mjs");
-    logManager.removeAllLogs().catch(err => {
-      console.error("Failed to flush the log", err);
-    }).then(() => {
+    logManager.removeAllLogs().then(() => {
       let eh = Weave.Service.errorHandler;
       eh._log.info("about:sync removed all logs due to user request");
+      toast("Removed all logs");
       this.reload();
+    }).catch(err => {
+      toast_error("Failed to flush the log", err);
     });
   }
 
@@ -371,6 +373,7 @@ class LogFilesComponent extends React.Component {
     if (text) {
       let eh = Weave.Service.errorHandler;
       eh._log.info(`about:sync custom log entry: ${text}`);
+      toast("Wrote the log entry");
     }
   }
 
@@ -395,7 +398,7 @@ class LogFilesComponent extends React.Component {
         result.numErrors += fileName.startsWith("error-") ? 1 : 0;
       });
     } catch(err) {
-      console.error("Failed to fetch the logfiles", err);
+      toast_error("Failed to fetch the logfiles", err);
     }
     // Update the state
     this.setState({ logFiles: result });
