@@ -8,6 +8,10 @@ Once installed, type `about:sync` into the URL bar.
 
 [Pull requests are welcome](https://github.com/mozilla-extensions/aboutsync)
 
+# Availability
+
+Available for Firefox here: https://addons.mozilla.org/firefox/addon/about-sync/
+
 # Running from source
 This is only possible in Nightly. To proceed, you must use `about:config` to
 set `extensions.experiments.enabled=true` and `xpinstall.signatures.required=false`.
