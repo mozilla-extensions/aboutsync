@@ -3,7 +3,8 @@ const { Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.
 const WeaveConstants = ChromeUtils.importESModule("resource://services-sync/constants.sys.mjs");
 const { XPCOMUtils } = ChromeUtils.importESModule("resource://gre/modules/XPCOMUtils.sys.mjs");
 if (typeof console !== "object") {
-  var { console  } = ChromeUtils.importESModule("resource://gre/modules/Console.sys.mjs");
+  const { ConsoleAPI  } = ChromeUtils.importESModule("resource://gre/modules/Console.sys.mjs");
+  var console = new ConsoleAPI();
 }
 
 XPCOMUtils.defineLazyServiceGetter(this, "AlertsService", "@mozilla.org/alerts-service;1", "nsIAlertsService");
@@ -172,10 +173,8 @@ function shutdown(data, reason) {
     Services.obs.removeObserver(syncStatusObserver, topic);
   }
 
-  const { Config } = Cu.import("chrome://aboutsync/content/config.js", {});
+  const { Config } = ChromeUtils.importESModule("chrome://aboutsync/content/config.js");
   Config.finalize();
-  // And unload it, so changes will get picked up if we reload the addon.
-  Cu.unload("chrome://aboutsync/content/config.js");
 
   chromeHandle.destruct();
   chromeHandle = null;
