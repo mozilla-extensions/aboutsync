@@ -4,7 +4,8 @@
 // and by the react-based UI code, and we also want it to be a singleton.
 const { Preferences } = ChromeUtils.importESModule("resource://gre/modules/Preferences.sys.mjs");
 if (typeof console !== "object") {
-  var { console  } = ChromeUtils.importESModule("resource://gre/modules/Console.sys.mjs");
+  const { ConsoleAPI  } = ChromeUtils.importESModule("resource://gre/modules/Console.sys.mjs");
+  var console = new ConsoleAPI();
 }
 
 function fixDesc(desc) {
