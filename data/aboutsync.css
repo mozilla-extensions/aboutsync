@@ -381,6 +381,40 @@ html {
   margin: 5px 0px;
 }
 
+.storage-sync-sections {
+  display: flex;
+}
+
+.storage-sync-sections > * {
+  flex: 1 1 0;
+}
+
+.storage-sync-ext-warning {
+  color: lightcoral;
+  font-weight: bold;
+  font-size: 125%;
+}
+
+.storage-input {
+  height: 1.5em;
+  flex: auto;
+}
+
+.storage-value-input {
+  height: 1.5em;
+  width: 75%;
+}
+
+.horiz-action-row {
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.horiz-action-row > * {
+  margin-right: 7px;
+  vertical-align: middle;
+}
+
 .error-message {
   background: rgb(255, 128, 128);
   border: 1px solid red;

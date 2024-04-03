@@ -39,12 +39,12 @@ class EngineActions extends React.Component {
   render() {
     let reset;
     if (this.props.engine.resetClient) {
-      reset = 
-        <div>
+      reset =
+        <div className="horiz-action-row">
           <span>Resetting an engine clears all local state, so the next Sync will
                 act as though this was the first sync for that engine's data -
                 all records will be downloaded, compared against local records
-                and missing records uploaded - 
+                and missing records uploaded
           </span>
           <button onClick={event => this.reset(event)}>Reset {this.props.engine.name}</button>
         </div>
@@ -53,10 +53,9 @@ class EngineActions extends React.Component {
     let wipe;
     if (canWipe) {
       wipe =
-        <div>
+        <div className="horiz-action-row">
           <span>Wiping an engine removes data from the server. <em>It does not remove local data</em>.
                 This device will upload all its data. Other devices will act like a <i>Reset</i>, as described above.
-                -
           </span>
           <button onClick={event => this.wipe(event)}>Wipe {this.props.engine.name}</button>
         </div>
