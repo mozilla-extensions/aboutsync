@@ -8,6 +8,7 @@ const { EngineActions } = require("./EngineActions");
 const { ProviderState } = require("./provider");
 const { PlacesSqlView, promiseSql } = require("./PlacesSqlView");
 const { BookmarkValidator } = require("./bookmarkValidator");
+const { WebExtStorage } = require("./WebExtStorage");
 
 const validation = require("./validation");
 
@@ -106,6 +107,12 @@ const collectionComponentBuilders = {
     };
   },
 
+  async extension_storage(provider, serverRecords) {
+    return {
+      "storage.sync": <WebExtStorage serverRecords={serverRecords}/>,
+    }
+  },
+
   async passwords(provider, serverRecords) {
     return basicBuilder(new PasswordValidator(), serverRecords, true, ["guid", "id"]);
   },
@@ -187,7 +194,7 @@ class CollectionViewer extends React.Component {
   async fetchCollection() {
     let {response, records} = await this.props.provider.promiseCollection(this.props.info);
     let originalRecords = await arrayCloneWithoutJank(records);
-    let additionalBuilder = collectionComponentBuilders[this.props.info.name];
+    let additionalBuilder = collectionComponentBuilders[this.props.info.name.replace("-", "_")];
     this.setState({
       response,
       records,
