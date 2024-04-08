@@ -4,6 +4,17 @@ This *desktop-only* addon shows information about your Sync account, including s
 server data for your account. It is designed primarily for Sync developers, or
 advanced users who would like insights into their Sync data.
 
+It is a React app which needs full chrome permissions - ie, the .jsx files have
+`ChromeUtils` and are able to reach into the internal sync/fxa/etc implementation
+to display and edit. It mostly just reads, but it includes destructive
+functionality; arbitrary editing of sync related stuff, raw sql execution, etc.
+
+It does this by abusing addons "experimental api" support - where the "api" here
+is "whatever it takes to give ChromeUtils to our jsx". See ext_bootstrap.js.
+And to register the about page - see "*Redirector.js".
+
+# Using the addon
+
 Once installed, type `about:sync` into the URL bar.
 
 [Pull requests are welcome](https://github.com/mozilla-extensions/aboutsync)
