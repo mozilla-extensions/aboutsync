@@ -15,7 +15,6 @@ const validation = require("./validation");
 const { Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.mjs");
 const { AddonValidator } = ChromeUtils.importESModule("resource://services-sync/engines/addons.sys.mjs");
 const { PasswordValidator } = ChromeUtils.importESModule("resource://services-sync/engines/passwords.sys.mjs");
-const { FormValidator } = ChromeUtils.importESModule("resource://services-sync/engines/forms.sys.mjs");
 
 // takes an array of objects who have no real properties but have a bunch of
 // getters on their prototypes, and returns an array of new objects that contain
@@ -118,6 +117,8 @@ const collectionComponentBuilders = {
   },
 
   async forms(provider, serverRecords) {
+    // This engine isn't shipped in Thunderbird. Import it lazily to avoid failure.
+    const { FormValidator } = ChromeUtils.importESModule("resource://services-sync/engines/forms.sys.mjs");
     return basicBuilder(new FormValidator(), serverRecords, false);
   },
 
