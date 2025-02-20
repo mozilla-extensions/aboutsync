@@ -2,6 +2,8 @@ const { Log } = ChromeUtils.importESModule("resource://gre/modules/Log.sys.mjs")
 const { Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.mjs");
 const WeaveConstants = ChromeUtils.importESModule("resource://services-sync/constants.sys.mjs");
 const { XPCOMUtils } = ChromeUtils.importESModule("resource://gre/modules/XPCOMUtils.sys.mjs");
+const { STATUS_OK, MASTER_PASSWORD_LOCKED, LOGIN_FAILED_LOGIN_REJECTED, SERVER_MAINTENANCE, LOGIN_FAILED_NETWORK_ERROR } = ChromeUtils.importESModule("resource://services-sync/constants.sys.mjs");
+
 if (typeof console !== "object") {
   const { ConsoleAPI  } = ChromeUtils.importESModule("resource://gre/modules/Console.sys.mjs");
   var console = new ConsoleAPI();
@@ -70,12 +72,12 @@ function syncStatusObserver(subject, topic, data) {
 }
 
 function shouldReportError(data) {
-  if (Weave.Status.service == WeaveConstants.STATUS_OK ||
-      Weave.Status.login == WeaveConstants.MASTER_PASSWORD_LOCKED) {
+  if (Weave.Status.service == STATUS_OK ||
+      Weave.Status.login == MASTER_PASSWORD_LOCKED) {
     return false;
   }
 
-  if (Weave.Status.login == WeaveConstants.LOGIN_FAILED_LOGIN_REJECTED) {
+  if (Weave.Status.login == LOGIN_FAILED_LOGIN_REJECTED) {
     return true;
   }
 
@@ -92,8 +94,8 @@ function shouldReportError(data) {
     return false;
   }
 
-  return ![Weave.Status.login, Weave.Status.sync].includes(WeaveConstants.SERVER_MAINTENANCE) &&
-         ![Weave.Status.login, Weave.Status.sync].includes(WeaveConstants.LOGIN_FAILED_NETWORK_ERROR);
+  return ![Weave.Status.login, Weave.Status.sync].includes(SERVER_MAINTENANCE) &&
+         ![Weave.Status.login, Weave.Status.sync].includes(LOGIN_FAILED_NETWORK_ERROR);
 }
 
 let chromeHandle;
