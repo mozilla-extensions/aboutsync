@@ -40,7 +40,9 @@ this.aboutsync = class extends ExtensionAPI {
                   console.error("FAILED to shutdown", ex);
                 }
                 ns = null;
-                Cu.unload(bootstrap);
+                // We can't do this any more - not sure it matters, but if it does, it would
+                // only be when upgrading to a new version?
+                // Cu.unload(bootstrap);
 
               }
             }

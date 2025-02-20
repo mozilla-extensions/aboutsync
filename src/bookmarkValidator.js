@@ -11,30 +11,16 @@
 
 "use strict";
 
-const { CommonUtils } = ChromeUtils.import(
-  "resource://services-common/utils.js"
+const { CommonUtils } = ChromeUtils.importESModule(
+  "resource://services-common/utils.sys.mjs"
 );
-const { Utils } = ChromeUtils.import("resource://services-sync/util.js");
+const { Utils } = ChromeUtils.importESModule("resource://services-sync/util.sys.mjs");
 
 const lazy = {};
 
-ChromeUtils.defineModuleGetter(
-  lazy,
-  "Async",
-  "resource://services-common/async.js"
-);
-
-ChromeUtils.defineModuleGetter(
-  lazy,
-  "PlacesUtils",
-  "resource://gre/modules/PlacesUtils.jsm"
-);
-
-ChromeUtils.defineModuleGetter(
-  lazy,
-  "PlacesSyncUtils",
-  "resource://gre/modules/PlacesSyncUtils.jsm"
-);
+const { Async } = ChromeUtils.importESModule("resource://services-common/async.sys.mjs");
+const { PlacesUtils } = ChromeUtils.importESModule("resource://gre/modules/PlacesUtils.sys.mjs");
+const { PlacesSyncUtils } = ChromeUtils.importESModule("resource://gre/modules/PlacesSyncUtils.sys.mjs");
 
 //var EXPORTED_SYMBOLS = ["BookmarkValidator", "BookmarkProblemData"];
 
@@ -239,10 +225,10 @@ class BookmarkProblemData {
 
 // Defined lazily to avoid initializing PlacesUtils.bookmarks too soon.
 ChromeUtils.defineLazyGetter(lazy, "SYNCED_ROOTS", () => [
-  lazy.PlacesUtils.bookmarks.menuGuid,
-  lazy.PlacesUtils.bookmarks.toolbarGuid,
-  lazy.PlacesUtils.bookmarks.unfiledGuid,
-  lazy.PlacesUtils.bookmarks.mobileGuid,
+  PlacesUtils.bookmarks.menuGuid,
+  PlacesUtils.bookmarks.toolbarGuid,
+  PlacesUtils.bookmarks.unfiledGuid,
+  PlacesUtils.bookmarks.mobileGuid,
 ]);
 
 // Maps root GUIDs to their query folder names from
@@ -250,16 +236,16 @@ ChromeUtils.defineLazyGetter(lazy, "SYNCED_ROOTS", () => [
 // reference existing folders in the client tree, and detect cycles where a
 // query references its containing folder.
 ChromeUtils.defineLazyGetter(lazy, "ROOT_GUID_TO_QUERY_FOLDER_NAME", () => ({
-  [lazy.PlacesUtils.bookmarks.rootGuid]: "PLACES_ROOT",
-  [lazy.PlacesUtils.bookmarks.menuGuid]: "BOOKMARKS_MENU",
+  [PlacesUtils.bookmarks.rootGuid]: "PLACES_ROOT",
+  [PlacesUtils.bookmarks.menuGuid]: "BOOKMARKS_MENU",
 
   // Tags should never show up in our client tree, and never form cycles, but we
   // report them just in case.
-  [lazy.PlacesUtils.bookmarks.tagsGuid]: "TAGS",
+  [PlacesUtils.bookmarks.tagsGuid]: "TAGS",
 
-  [lazy.PlacesUtils.bookmarks.unfiledGuid]: "UNFILED_BOOKMARKS",
-  [lazy.PlacesUtils.bookmarks.toolbarGuid]: "TOOLBAR",
-  [lazy.PlacesUtils.bookmarks.mobileGuid]: "MOBILE_BOOKMARKS",
+  [PlacesUtils.bookmarks.unfiledGuid]: "UNFILED_BOOKMARKS",
+  [PlacesUtils.bookmarks.toolbarGuid]: "TOOLBAR",
+  [PlacesUtils.bookmarks.mobileGuid]: "MOBILE_BOOKMARKS",
 }));
 
 async function detectCycles(records) {
@@ -270,7 +256,7 @@ async function detectCycles(records) {
   let currentPath = [];
   let cycles = [];
   let seenEver = new Set();
-  const yieldState = lazy.Async.yieldState();
+  const yieldState = Async.yieldState();
 
   const traverse = async node => {
     if (pathLookup.has(node)) {
@@ -291,13 +277,13 @@ async function detectCycles(records) {
     if (children.length) {
       pathLookup.add(node);
       currentPath.push(node);
-      await lazy.Async.yieldingForEach(children, traverse, yieldState);
+      await Async.yieldingForEach(children, traverse, yieldState);
       currentPath.pop();
       pathLookup.delete(node);
     }
   };
 
-  await lazy.Async.yieldingForEach(
+  await Async.yieldingForEach(
     records,
     async record => {
       if (!seenEver.has(record)) {
@@ -330,7 +316,7 @@ class ServerRecordInspection {
     this._orphans = new Map();
     this._multipleParents = new Map();
 
-    this.yieldState = lazy.Async.yieldState();
+    this.yieldState = Async.yieldState();
   }
 
   static async create(records) {
@@ -385,7 +371,7 @@ class ServerRecordInspection {
     this.serverRecords = records;
     let rootChildren = [];
 
-    await lazy.Async.yieldingForEach(
+    await Async.yieldingForEach(
       this.serverRecords,
       async record => {
         if (!record.id) {
@@ -449,7 +435,7 @@ class ServerRecordInspection {
         // The last two are left alone until later `this._linkChildren`, however.
         record.childGUIDs = record.children;
 
-        await lazy.Async.yieldingForEach(
+        await Async.yieldingForEach(
           record.childGUIDs,
           id => {
             this.noteParent(id, record.id);
@@ -498,7 +484,7 @@ class ServerRecordInspection {
 
   // Adds `parent` to all records it can that have `parentid`
   async _linkParentIDs() {
-    await lazy.Async.yieldingForEach(
+    await Async.yieldingForEach(
       this.idToRecord,
       ([id, record]) => {
         if (record == this.root || record.deleted) {
@@ -547,7 +533,7 @@ class ServerRecordInspection {
   // objects, not ids)
   async _linkChildren() {
     // Check that we aren't missing any children.
-    await lazy.Async.yieldingForEach(
+    await Async.yieldingForEach(
       this.folders,
       async folder => {
         folder.children = [];
@@ -555,7 +541,7 @@ class ServerRecordInspection {
 
         let idsThisFolder = new Set();
 
-        await lazy.Async.yieldingForEach(
+        await Async.yieldingForEach(
           folder.childGUIDs,
           childID => {
             let child = this.idToRecord.get(childID);
@@ -601,7 +587,7 @@ class ServerRecordInspection {
   async _findOrphans() {
     let seen = new Set([this.root.id]);
 
-    const inCycle = await lazy.Async.yieldingForEach(
+    const inCycle = await Async.yieldingForEach(
       Utils.walkTree(this.root),
       ([node]) => {
         if (seen.has(node.id)) {
@@ -620,7 +606,7 @@ class ServerRecordInspection {
       return;
     }
 
-    await lazy.Async.yieldingForEach(
+    await Async.yieldingForEach(
       this.liveRecords,
       (record, i) => {
         if (!seen.has(record.id)) {
@@ -633,7 +619,7 @@ class ServerRecordInspection {
       this.yieldState
     );
 
-    await lazy.Async.yieldingForEach(
+    await Async.yieldingForEach(
       this._orphans,
       ([id, parent]) => {
         this.problemData.orphans.push({ id, parent });
@@ -668,15 +654,15 @@ class ServerRecordInspection {
 
 class BookmarkValidator {
   constructor() {
-    this.yieldState = lazy.Async.yieldState();
+    this.yieldState = Async.yieldState();
   }
 
   async canValidate() {
-    return !(await lazy.PlacesSyncUtils.bookmarks.havePendingChanges());
+    return !(await PlacesSyncUtils.bookmarks.havePendingChanges());
   }
 
   async _followQueries(recordsByQueryId) {
-    await lazy.Async.yieldingForEach(
+    await Async.yieldingForEach(
       recordsByQueryId.values(),
       entry => {
         if (
@@ -725,26 +711,26 @@ class BookmarkValidator {
         synced = syncedRoots.includes(treeNode.guid);
       }
       let localId = treeNode.id;
-      let guid = lazy.PlacesSyncUtils.bookmarks.guidToRecordId(treeNode.guid);
+      let guid = PlacesSyncUtils.bookmarks.guidToRecordId(treeNode.guid);
       let itemType = "item";
       treeNode.ignored = !synced;
       treeNode.id = guid;
       switch (treeNode.type) {
-        case lazy.PlacesUtils.TYPE_X_MOZ_PLACE:
+        case PlacesUtils.TYPE_X_MOZ_PLACE:
           if (treeNode.uri.startsWith(QUERY_PROTOCOL)) {
             itemType = "query";
           } else {
             itemType = "bookmark";
           }
           break;
-        case lazy.PlacesUtils.TYPE_X_MOZ_PLACE_CONTAINER:
+        case PlacesUtils.TYPE_X_MOZ_PLACE_CONTAINER:
           let isLivemark = false;
           if (treeNode.annos) {
             for (let anno of treeNode.annos) {
-              if (anno.name === lazy.PlacesUtils.LMANNO_FEEDURI) {
+              if (anno.name === PlacesUtils.LMANNO_FEEDURI) {
                 isLivemark = true;
                 treeNode.feedUri = anno.value;
-              } else if (anno.name === lazy.PlacesUtils.LMANNO_SITEURI) {
+              } else if (anno.name === PlacesUtils.LMANNO_SITEURI) {
                 isLivemark = true;
                 treeNode.siteUri = anno.value;
               }
@@ -752,7 +738,7 @@ class BookmarkValidator {
           }
           itemType = isLivemark ? "livemark" : "folder";
           break;
-        case lazy.PlacesUtils.TYPE_X_MOZ_PLACE_SEPARATOR:
+        case PlacesUtils.TYPE_X_MOZ_PLACE_SEPARATOR:
           itemType = "separator";
           break;
       }
@@ -783,7 +769,7 @@ class BookmarkValidator {
           treeNode.children = [];
         }
 
-        await lazy.Async.yieldingForEach(
+        await Async.yieldingForEach(
           treeNode.children,
           async child => {
             await traverse(child, synced);
@@ -851,7 +837,7 @@ class BookmarkValidator {
 
   async _computeUnifiedRecordMap(serverRecords, clientRecords) {
     let allRecords = new Map();
-    await lazy.Async.yieldingForEach(
+    await Async.yieldingForEach(
       serverRecords,
       sr => {
         if (sr.fake) {
@@ -862,7 +848,7 @@ class BookmarkValidator {
       this.yieldState
     );
 
-    await lazy.Async.yieldingForEach(
+    await Async.yieldingForEach(
       clientRecords,
       cr => {
         let unified = allRecords.get(cr.id);
@@ -1001,7 +987,7 @@ class BookmarkValidator {
 
     let serverDeleted = new Set(inspectionInfo.deletedRecords.map(r => r.id));
 
-    await lazy.Async.yieldingForEach(
+    await Async.yieldingForEach(
       allRecords,
       ([id, { client, server }]) => {
         if (!client || !server) {
@@ -1043,7 +1029,7 @@ class BookmarkValidator {
       throw result.response;
     }
     let cleartexts = [];
-    await lazy.Async.yieldingForEach(
+    await Async.yieldingForEach(
       result.records,
       async record => {
         await record.decrypt(collectionKey);
@@ -1056,7 +1042,7 @@ class BookmarkValidator {
 
   async validate(engine) {
     let start = Date.now();
-    let clientTree = await lazy.PlacesUtils.promiseBookmarksTree("", {
+    let clientTree = await PlacesUtils.promiseBookmarksTree("", {
       includeItemIds: true,
     });
     let serverState = await this._getServerState(engine);
