@@ -1,6 +1,5 @@
 const { Log } = ChromeUtils.importESModule("resource://gre/modules/Log.sys.mjs");
 const { Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.mjs");
-const WeaveConstants = ChromeUtils.importESModule("resource://services-sync/constants.sys.mjs");
 const { XPCOMUtils } = ChromeUtils.importESModule("resource://gre/modules/XPCOMUtils.sys.mjs");
 const { STATUS_OK, MASTER_PASSWORD_LOCKED, LOGIN_FAILED_LOGIN_REJECTED, SERVER_MAINTENANCE, LOGIN_FAILED_NETWORK_ERROR } = ChromeUtils.importESModule("resource://services-sync/constants.sys.mjs");
 
