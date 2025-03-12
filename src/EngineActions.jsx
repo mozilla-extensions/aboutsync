@@ -8,6 +8,7 @@ class EngineActions extends React.Component {
   static get propTypes() {
     return {
       engine: PropTypes.object.isRequired,
+      records: PropTypes.array,
     };
   }
 
@@ -26,6 +27,9 @@ class EngineActions extends React.Component {
     });
   }
 
+  bookmark(event) {
+    console.log('bookmark')
+  }
   wipe(event) {
     let e = this.props.engine;
     e._log.info("about:sync wiping engine due to user request");
@@ -37,6 +41,25 @@ class EngineActions extends React.Component {
   }
 
   render() {
+    let bookmark;
+    if (this.props.engine.name == 'tabs'){
+      console.log(this.props.records)
+      const devices = []
+      for (const device of this.props.records){
+        devices.push(
+          <option key={device.id} value={device.id}>{device.clientName}</option>
+        )
+      }
+      bookmark =
+        <div className="horiz-action-row">
+          <span>Bookmark tabs from </span>
+          <select name="device" id ="device">
+            {devices}
+          </select>
+          <button onClick={event => this.bookmark(event)}> Go </button>
+        </div>
+    }
+
     let reset;
     if (this.props.engine.resetClient) {
       reset =
@@ -62,6 +85,7 @@ class EngineActions extends React.Component {
     };
     return (
       <>
+      { bookmark }
       { reset }
       { wipe }
     </>
