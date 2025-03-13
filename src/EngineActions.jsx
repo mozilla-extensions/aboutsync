@@ -28,7 +28,36 @@ class EngineActions extends React.Component {
   }
 
   bookmark(event) {
-    console.log('bookmark')
+    event.preventDefault();
+    const data = new FormData(event.target);
+    const device_id = Object.fromEntries(data.entries()).device;
+    const record = this.props.records.filter(r => r.id == device_id)[0];
+    const tabs = record.tabs
+    const device = record.clientName
+    console.log(device)
+    console.log(tabs)
+    console.log("hey")
+    console.log(browser.runtime.sendMessage).catch(e => console.log(e))
+    browser.runtime.sendMessage({
+      device:device,
+      tabs:tabs
+    }).catch(e => console.log(e))
+    // console.log(browser.bookmarks.create({}))
+    // let createBookmark = browser.bookmarks.create({
+    //   title: "bookmarks.create() on MDN",
+    //   url: "https://developer.mozilla.org/Add-ons/WebExtensions/API/bookmarks/create",
+    // }).catch((error) => console.error(error));
+    console.log("ho")
+    // .then(treeNode => {
+    //   for (const [i, tab] of tabs.entries()){
+    //     browser.bookmarks.create({
+    //       "index":i,
+    //       "parentId":treeNode,
+    //       "title":tab.title,
+    //       "url":tab.urlHistory[0]
+    //     });
+    //   }
+    // });
   }
   wipe(event) {
     let e = this.props.engine;
@@ -52,11 +81,14 @@ class EngineActions extends React.Component {
       }
       bookmark =
         <div className="horiz-action-row">
-          <span>Bookmark tabs from </span>
-          <select name="device" id ="device">
-            {devices}
-          </select>
-          <button onClick={event => this.bookmark(event)}> Go </button>
+          <form method="post" onSubmit={this.bookmark.bind(this)}>
+            <label>Bookmark tabs from 
+              <select name="device" id ="device">
+                {devices}
+              </select>
+            </label>
+            <button type="submit"> Go </button>
+          </form>
         </div>
     }
 
