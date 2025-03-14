@@ -2,6 +2,7 @@
 const React = require("react");
 const { toast, toast_error } = require('./common');
 const PropTypes = require("prop-types");
+const { Bookmarks } = ChromeUtils.importESModule("resource://gre/modules/Bookmarks.sys.mjs")
 
 class EngineActions extends React.Component {
 
@@ -37,27 +38,25 @@ class EngineActions extends React.Component {
     console.log(device)
     console.log(tabs)
     console.log("hey")
-    console.log(browser.runtime.sendMessage).catch(e => console.log(e))
-    browser.runtime.sendMessage({
-      device:device,
-      tabs:tabs
-    }).catch(e => console.log(e))
-    // console.log(browser.bookmarks.create({}))
-    // let createBookmark = browser.bookmarks.create({
-    //   title: "bookmarks.create() on MDN",
-    //   url: "https://developer.mozilla.org/Add-ons/WebExtensions/API/bookmarks/create",
-    // }).catch((error) => console.error(error));
-    console.log("ho")
-    // .then(treeNode => {
-    //   for (const [i, tab] of tabs.entries()){
-    //     browser.bookmarks.create({
-    //       "index":i,
-    //       "parentId":treeNode,
-    //       "title":tab.title,
-    //       "url":tab.urlHistory[0]
-    //     });
-    //   }
-    // });
+    console.log(Bookmarks)
+    const now = new Date()
+    const datetime = now.toLocaleString();
+    createFolder = Bookmarks.insert({
+      type:Bookmarks.TYPE_FOLDER,
+      parentGuid:Bookmarks.unfiledGuid,
+      title:`${device}, ${datetime}`
+    }).then(treeNode => {
+        for (const tab of tabs){
+          const args = {
+            parentGuid:treeNode.guid,
+            title:tab.title,
+            type:Bookmarks.TYPE_BOOKMARK,
+            url:tab.urlHistory[0]
+          };
+          console.log(args)
+          Bookmarks.insert(args).catch(e => console.error(e));
+        }});
+    console.log('ho')
   }
   wipe(event) {
     let e = this.props.engine;

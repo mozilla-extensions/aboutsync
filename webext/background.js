@@ -17,10 +17,3 @@ browser.runtime.onInstalled.addListener(() => {
 browser.runtime.onStartup.addListener(() => {
   browser.aboutsync.startup();
 });
-
-function bookmarkTabs(msg, sender, sendRes){
-  console.log(msg.device)
-  browser.bookmark.create({title:'test'})
-}
-
-browser.runtime.onMessage.addListener(bookmarkTabs);
