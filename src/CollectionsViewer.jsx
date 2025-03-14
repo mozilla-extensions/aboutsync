@@ -259,14 +259,6 @@ class CollectionViewer extends React.Component {
     let recordsExpandLevel = this.state.records.length < 20 ? 2 : 1;
     return (
       <TabView>
-        {this.props.provider.isLocal && engine && (
-          <TabPanel name="Engine Actions" key="actions">
-            <EngineActions
-              engine={engine} 
-              records={this.state.originalRecords}
-              />
-          </TabPanel>
-        )}
         <TabPanel name="Summary" key="summary">
           {this.renderSummary()}
           <ObjectInspector name="Response" data={this.state.response} expandLevel={0}/>
@@ -288,11 +280,19 @@ class CollectionViewer extends React.Component {
               records={this.state.originalRecords}/>
           </TabPanel>
         )}
+        {this.props.provider.isLocal && engine && (
+          <TabPanel name="Engine Actions" key="actions">
+            <EngineActions
+              engine={engine} 
+              records={this.state.originalRecords}
+              />
+          </TabPanel>
+        )}
         {this.renderAdditionalTabs()}
       </TabView>
     );
   }
-
+  
   render() {
     let body = this.state.records
              ? this.renderTabs()
@@ -351,7 +351,7 @@ class CollectionsViewer extends React.Component {
     return (
       <div>
         <p key="status-msg">Status: {info.status}</p>
-        {info.collections.filter(collection => collection.name == "tabs").map(collection =>
+        {info.collections.map(collection =>
           <CollectionViewer provider={provider} info={collection} key={collection.name} fullInfo={info} />)}
       </div>
     );
