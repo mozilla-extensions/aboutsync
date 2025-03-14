@@ -35,10 +35,6 @@ class EngineActions extends React.Component {
     const record = this.props.records.filter(r => r.id == device_id)[0];
     const tabs = record.tabs
     const device = record.clientName
-    console.log(device)
-    console.log(tabs)
-    console.log("hey")
-    console.log(Bookmarks)
     const now = new Date()
     const datetime = now.toLocaleString();
     createFolder = Bookmarks.insert({
@@ -53,10 +49,8 @@ class EngineActions extends React.Component {
             type:Bookmarks.TYPE_BOOKMARK,
             url:tab.urlHistory[0]
           };
-          console.log(args)
-          Bookmarks.insert(args).catch(e => console.error(e));
-        }});
-    console.log('ho')
+          Bookmarks.insert(args);
+        }}).catch(e => console.error(e));
   }
   wipe(event) {
     let e = this.props.engine;

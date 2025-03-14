@@ -280,6 +280,7 @@ class CollectionViewer extends React.Component {
               records={this.state.originalRecords}/>
           </TabPanel>
         )}
+        {this.renderAdditionalTabs()}
         {this.props.provider.isLocal && engine && (
           <TabPanel name="Engine Actions" key="actions">
             <EngineActions
@@ -288,7 +289,6 @@ class CollectionViewer extends React.Component {
               />
           </TabPanel>
         )}
-        {this.renderAdditionalTabs()}
       </TabView>
     );
   }
