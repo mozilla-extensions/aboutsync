@@ -1,12 +1,8 @@
 // Helpers for the config component.
 
-// This is a bit of a special module in that it's imported both by bootstrap.js
+// This is a bit of a special module in that it's imported both by ext_bootstrap.js
 // and by the react-based UI code, and we also want it to be a singleton.
 const { Preferences } = ChromeUtils.importESModule("resource://gre/modules/Preferences.sys.mjs");
-if (typeof console !== "object") {
-  const { ConsoleAPI  } = ChromeUtils.importESModule("resource://gre/modules/Console.sys.mjs");
-  var console = new ConsoleAPI();
-}
 
 function fixDesc(desc) {
   return desc.replace(/( |\t|\r|\n)+/g, " ");
