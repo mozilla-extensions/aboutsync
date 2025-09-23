@@ -3,14 +3,41 @@
 
 const React = require("react");
 const { Fetching, InternalAnchor, toast, toast_error } = require("./common");
-
-const { Log } = ChromeUtils.importESModule("resource://gre/modules/Log.sys.mjs");
-const { Preferences } = ChromeUtils.importESModule("resource://gre/modules/Preferences.sys.mjs");
-const { FileUtils } = ChromeUtils.importESModule("resource://gre/modules/FileUtils.sys.mjs");
-const { Downloads } = ChromeUtils.importESModule("resource://gre/modules/Downloads.sys.mjs");
-const { Config } = ChromeUtils.importESModule("chrome://aboutsync/content/config.js");
 const { Panel, PanelGroup } = require("./panel");
-const { Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.mjs");
+
+let Log;
+let Preferences;
+let FileUtils;
+let Downloads;
+let Weave;
+
+try {
+  ({ Log } = ChromeUtils.importESModule("resource://gre/modules/Log.sys.mjs"));
+} catch {
+  ({ Log } = ChromeUtils.importESModule("moz-src:///toolkit/modules/Log.sys.mjs"));
+}
+try {
+  ({ Preferences } = ChromeUtils.importESModule("resource://gre/modules/Preferences.sys.mjs"));
+} catch {
+  ({ Preferences } = ChromeUtils.importESModule("moz-src:///toolkit/modules/Preferences.sys.mjs"));
+}
+try {
+  ({ FileUtils } = ChromeUtils.importESModule("resource://gre/modules/FileUtils.sys.mjs"));
+} catch {
+  ({ FileUtils } = ChromeUtils.importESModule("moz-src:///toolkit/modules/FileUtils.sys.mjs"));
+}
+try {
+  ({ Downloads } = ChromeUtils.importESModule("resource://gre/modules/Downloads.sys.mjs"));
+} catch {
+  ({ Downloads } = ChromeUtils.importESModule("moz-src:///toolkit/components/downloads/Downloads.sys.mjs"));
+}
+try {
+  ({ Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.mjs"));
+} catch {
+  ({ Weave } = ChromeUtils.importESModule("moz-src:///services/sync/modules/main.sys.mjs"));
+}
+
+const { Config } = ChromeUtils.importESModule("chrome://aboutsync/content/config.js");
 
 // For our "Sync Preferences" support.
 // A "log level" <select> element.
@@ -357,7 +384,12 @@ class LogFilesComponent extends React.Component {
   }
 
   removeAllLogs(event) {
-    const { logManager } = ChromeUtils.importESModule("resource://gre/modules/FxAccountsCommon.sys.mjs");
+    let logManager;
+    try {
+      ({ logManager } = ChromeUtils.importESModule("resource://gre/modules/FxAccountsCommon.sys.mjs"));
+    } catch {
+      ({ logManager } = ChromeUtils.importESModule("moz-src:///services/fxaccounts/FxAccountsCommon.sys.mjs"));
+    }
     logManager.removeAllLogs().then(() => {
       let eh = Weave.Service.errorHandler;
       eh._log.info("about:sync removed all logs due to user request");

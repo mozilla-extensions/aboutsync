@@ -2,7 +2,12 @@
 
 // This is a bit of a special module in that it's imported both by ext_bootstrap.js
 // and by the react-based UI code, and we also want it to be a singleton.
-const { Preferences } = ChromeUtils.importESModule("resource://gre/modules/Preferences.sys.mjs");
+let Preferences;
+try {
+  ({ Preferences } = ChromeUtils.importESModule("resource://gre/modules/Preferences.sys.mjs"));
+} catch {
+  ({ Preferences } = ChromeUtils.importESModule("moz-src:///toolkit/modules/Preferences.sys.mjs"));
+}
 
 function fixDesc(desc) {
   return desc.replace(/( |\t|\r|\n)+/g, " ");

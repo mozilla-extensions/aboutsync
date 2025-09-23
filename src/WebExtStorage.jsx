@@ -1,7 +1,12 @@
 import React from 'react'
 
 const { ObjectInspector } = require("./common");
-const { extensionStorageSync } = ChromeUtils.importESModule( "resource://gre/modules/ExtensionStorageSync.sys.mjs");
+let extensionStorageSync;
+try {
+  (extensionStorageSync = ChromeUtils.importESModule("resource://gre/modules/ExtensionStorageSync.sys.mjs"));
+} catch {
+  (extensionStorageSync = ChromeUtils.importESModule("moz-src:///toolkit/components/extensions/ExtensionStorageSync.sys.mjs"));
+}
 
 export class WebExtStorage extends React.Component {
   constructor(props) {

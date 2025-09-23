@@ -2,7 +2,13 @@
 const React = require("react");
 const PropTypes = require("prop-types");
 const { ErrorDisplay } = require("./common");
-const { Utils } = ChromeUtils.importESModule("resource://services-sync/util.sys.mjs");
+let Utils;
+try {
+  ({ Utils } = ChromeUtils.importESModule("resource://services-sync/util.sys.mjs"));
+} catch {
+  ({ Utils } = ChromeUtils.importESModule("moz-src:///services/sync/modules/util.sys.mjs"));
+}
+
 const { toast, toast_error } = require("./common");
 
 function shortenText(x, maxLen) {

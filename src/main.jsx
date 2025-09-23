@@ -8,13 +8,25 @@ const { ProviderState, ProviderInfo } = require("./provider");
 const { CollectionsViewer } = require("./CollectionsViewer");
 const { ErrorDisplay, Fetching } = require("./common");
 
-const { Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.mjs");
+let Weave;
+try {
+  ({ Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.mjs"));
+} catch {
+  ({ Weave } = ChromeUtils.importESModule("moz-src:///services/sync/modules/main.sys.mjs"));
+}
+
 
 const weaveService = Cc["@mozilla.org/weave/service;1"]
                      .getService(Ci.nsISupports)
                      .wrappedJSObject;
 
-const { getFxAccountsSingleton } = ChromeUtils.importESModule("resource://gre/modules/FxAccounts.sys.mjs");
+let getFxAccountsSingleton;
+try {
+  ({ getFxAccountsSingleton } = ChromeUtils.importESModule("resource://gre/modules/FxAccounts.sys.mjs"));
+} catch {
+  ({ getFxAccountsSingleton } = ChromeUtils.importESModule("moz-src:///services/fxaccounts/FxAccounts.sys.mjs"));
+}
+
 const fxAccounts = getFxAccountsSingleton();
 
 // Returns a promise that resolves when Sync is ready and logged in.
