@@ -21,6 +21,7 @@ this.aboutsync = class extends ExtensionAPI {
                 wantGlobalProperties: ["ChromeUtils"],
               }
             );
+            ns.importFunction(console, "console");
             script.executeInGlobal(ns);
             try {
               ns.AboutSyncBootstrap.startup({context}, null);

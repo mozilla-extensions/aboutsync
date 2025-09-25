@@ -12,9 +12,25 @@ const { WebExtStorage } = require("./WebExtStorage");
 
 const validation = require("./validation");
 
-const { Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.mjs");
-const { AddonValidator } = ChromeUtils.importESModule("resource://services-sync/engines/addons.sys.mjs");
-const { PasswordValidator } = ChromeUtils.importESModule("resource://services-sync/engines/passwords.sys.mjs");
+let Weave;
+let AddonValidator;
+let PasswordValidator;
+
+try {
+  ({ Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.mjs"));
+} catch {
+  ({ Weave } = ChromeUtils.importESModule("moz-src:///services/sync/modules/main.sys.mjs"));
+}
+try {
+  ({ AddonValidator } = ChromeUtils.importESModule("resource://services-sync/engines/addons.sys.mjs"));
+} catch {
+  ({ AddonValidator } = ChromeUtils.importESModule("moz-src:///services/sync/modules/engines/addons.sys.mjs"));
+}
+try {
+  ({ PasswordValidator } = ChromeUtils.importESModule("resource://services-sync/engines/passwords.sys.mjs"));
+} catch {
+  ({ PasswordValidator } = ChromeUtils.importESModule("moz-src:///services/sync/modules/engines/passwords.sys.mjs"));
+}
 
 // takes an array of objects who have no real properties but have a bunch of
 // getters on their prototypes, and returns an array of new objects that contain

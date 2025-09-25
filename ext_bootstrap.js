@@ -1,13 +1,25 @@
-const { Log } = ChromeUtils.importESModule("resource://gre/modules/Log.sys.mjs");
-const { Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.mjs");
-const WeaveConstants = ChromeUtils.importESModule("resource://services-sync/constants.sys.mjs");
-const { XPCOMUtils } = ChromeUtils.importESModule("resource://gre/modules/XPCOMUtils.sys.mjs");
-const { STATUS_OK, MASTER_PASSWORD_LOCKED, LOGIN_FAILED_LOGIN_REJECTED, SERVER_MAINTENANCE, LOGIN_FAILED_NETWORK_ERROR } = ChromeUtils.importESModule("resource://services-sync/constants.sys.mjs");
+let XPCOMUtils;
+let Weave;
+let WeaveConstants;
 
-if (typeof console !== "object") {
-  const { ConsoleAPI  } = ChromeUtils.importESModule("resource://gre/modules/Console.sys.mjs");
-  var console = new ConsoleAPI();
+// Support pre and post moz-src URLs. These are in separate try/catch
+// statements, as we expect them to land at separate times.
+try {
+  ({ XPCOMUtils } = ChromeUtils.importESModule("resource://gre/modules/XPCOMUtils.sys.mjs"));
+} catch {
+  ({ XPCOMUtils } = ChromeUtils.importESModule("moz-src:///js/xpconnect/loader/XPCOMUtils.sys.mjs"));
 }
+try {
+  ({ Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.mjs"));
+} catch {
+  ({ Weave } = ChromeUtils.importESModule("moz-src:///services/sync/modules/main.sys.mjs"));
+}
+try {
+  WeaveConstants = ChromeUtils.importESModule("resource://services-sync/constants.sys.mjs");
+} catch {
+  WeaveConstants = ChromeUtils.importESModule("moz-src:///services/sync/modules/constants.sys.mjs")
+}
+const { STATUS_OK, MASTER_PASSWORD_LOCKED, LOGIN_FAILED_LOGIN_REJECTED, SERVER_MAINTENANCE, LOGIN_FAILED_NETWORK_ERROR } = WeaveConstants;
 
 XPCOMUtils.defineLazyServiceGetter(this, "AlertsService", "@mozilla.org/alerts-service;1", "nsIAlertsService");
 

@@ -3,7 +3,12 @@ const React = require("react");
 const { ErrorDisplay, valueLookupTable } = require("./common");
 const { TableInspector } = require("./AboutSyncTableInspector");
 
-const { PlacesUtils } = ChromeUtils.importESModule("resource://gre/modules/PlacesUtils.sys.mjs");
+let PlacesUtils;
+try {
+  ({ PlacesUtils } = ChromeUtils.importESModule("resource://gre/modules/PlacesUtils.sys.mjs"));
+} catch {
+  ({ PlacesUtils } = ChromeUtils.importESModule("moz-src:///toolkit/components/places/PlacesUtils.sys.mjs"));
+}
 
 const sqlQueryPref = "extensions.aboutsync.lastQuery";
 

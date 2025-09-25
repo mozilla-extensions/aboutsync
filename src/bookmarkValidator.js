@@ -11,16 +11,39 @@
 
 "use strict";
 
-const { CommonUtils } = ChromeUtils.importESModule(
-  "resource://services-common/utils.sys.mjs"
-);
-const { Utils } = ChromeUtils.importESModule("resource://services-sync/util.sys.mjs");
-
 const lazy = {};
 
-const { Async } = ChromeUtils.importESModule("resource://services-common/async.sys.mjs");
-const { PlacesUtils } = ChromeUtils.importESModule("resource://gre/modules/PlacesUtils.sys.mjs");
-const { PlacesSyncUtils } = ChromeUtils.importESModule("resource://gre/modules/PlacesSyncUtils.sys.mjs");
+let CommonUtils;
+let Utils;
+let Async;
+let PlacesUtils;
+let PlacesSyncUtils;
+
+try {
+  ({ CommonUtils } = ChromeUtils.importESModule("resource://services-common/utils.sys.mjs"));
+} catch {
+  ({ CommonUtils } = ChromeUtils.importESModule("moz-src:///services/common/utils.sys.mjs"));
+}
+try {
+  ({ Utils } = ChromeUtils.importESModule("resource://services-sync/util.sys.mjs"));
+} catch {
+  ({ Utils } = ChromeUtils.importESModule("moz-src:///services/sync/modules/util.sys.mjs"));
+}
+try {
+  ({ Async } = ChromeUtils.importESModule("resource://services-common/async.sys.mjs"));
+} catch {
+  ({ Async } = ChromeUtils.importESModule("moz-src:///services/common/async.sys.mjs"));
+}
+try {
+  ({ PlacesUtils } = ChromeUtils.importESModule("resource://gre/modules/PlacesUtils.sys.mjs"));
+} catch {
+  ({ PlacesUtils } = ChromeUtils.importESModule("moz-src:///toolkit/components/places/PlacesUtils.sys.mjs"));
+}
+try {
+  ({ PlacesSyncUtils } = ChromeUtils.importESModule("resource://gre/modules/PlacesSyncUtils.sys.mjs"));
+} catch {
+  ({ PlacesSyncUtils } = ChromeUtils.importESModule("moz-src:///toolkit/components/places/PlacesSyncUtils.sys.mjs"));
+}
 
 //var EXPORTED_SYMBOLS = ["BookmarkValidator", "BookmarkProblemData"];
 

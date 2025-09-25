@@ -3,10 +3,26 @@
 // Data can be provided by Sync itself, or by a JSON file.
 const { PrefCheckbox } = require("./config");
 
-const { Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.mjs");
+let PlacesUtils;
+let Weave;
+let SyncRecord;
 
-const { CryptoWrapper, Collection } = ChromeUtils.importESModule("resource://services-sync/record.sys.mjs");
-const { PlacesUtils } = ChromeUtils.importESModule("resource://gre/modules/PlacesUtils.sys.mjs");
+try {
+  ({ PlacesUtils } = ChromeUtils.importESModule("resource://gre/modules/PlacesUtils.sys.mjs"));
+} catch {
+  ({ PlacesUtils } = ChromeUtils.importESModule("moz-src:///toolkit/components/places/PlacesUtils.sys.mjs"));
+}
+try {
+  ({ Weave } = ChromeUtils.importESModule("resource://services-sync/main.sys.mjs"));
+} catch {
+  ({ Weave } = ChromeUtils.importESModule("moz-src:///services/sync/modules/main.sys.mjs"));
+}
+try {
+  (SyncRecord = ChromeUtils.importESModule("resource://services-sync/record.sys.mjs"));
+} catch {
+  (SyncRecord = ChromeUtils.importESModule("moz-src:///services/sync/modules/record.sys.mjs"));
+}
+const { CryptoWrapper, Collection } = SyncRecord;
 const { toast, toast_error } = require("./common");
 
 const React = require("react");
