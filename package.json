@@ -5,8 +5,7 @@
   "description": "About Sync Firefox addon",
   "scripts": {
     "build": "webpack --mode=production && web-ext build",
-    "dev": "webpack --mode=development --watch",
-    "lint": "web-ext lint --ignore-files=data/build.js"
+    "dev": "webpack --mode=development --watch"
   },
   "repository": {
     "type": "git",
