@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack --mode=production && web-ext build",
     "dev": "webpack --mode=development --watch",
-    "lint": "web-ext lint --ignore-files=data/build.js"
+    "lint": "web-ext lint --privileged --ignore-files=data/build.js"
   },
   "repository": {
     "type": "git",
