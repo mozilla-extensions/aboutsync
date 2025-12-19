@@ -2,12 +2,14 @@
 const React = require("react");
 const { toast, toast_error } = require('./common');
 const PropTypes = require("prop-types");
+const { Bookmarks } = ChromeUtils.importESModule("resource://gre/modules/Bookmarks.sys.mjs")
 
 class EngineActions extends React.Component {
 
   static get propTypes() {
     return {
       engine: PropTypes.object.isRequired,
+      records: PropTypes.array,
     };
   }
 
@@ -26,6 +28,30 @@ class EngineActions extends React.Component {
     });
   }
 
+  bookmark(event) {
+    event.preventDefault();
+    const data = new FormData(event.target);
+    const device_id = Object.fromEntries(data.entries()).device;
+    const record = this.props.records.filter(r => r.id == device_id)[0];
+    const tabs = record.tabs
+    const device = record.clientName
+    const now = new Date()
+    const datetime = now.toLocaleString();
+    createFolder = Bookmarks.insert({
+      type:Bookmarks.TYPE_FOLDER,
+      parentGuid:Bookmarks.unfiledGuid,
+      title:`${device}, ${datetime}`
+    }).then(treeNode => {
+        for (const tab of tabs){
+          const args = {
+            parentGuid:treeNode.guid,
+            title:tab.title,
+            type:Bookmarks.TYPE_BOOKMARK,
+            url:tab.urlHistory[0]
+          };
+          Bookmarks.insert(args);
+        }}).catch(e => console.error(e));
+  }
   wipe(event) {
     let e = this.props.engine;
     e._log.info("about:sync wiping engine due to user request");
@@ -37,6 +63,28 @@ class EngineActions extends React.Component {
   }
 
   render() {
+    let bookmark;
+    if (this.props.engine.name == 'tabs'){
+      console.log(this.props.records)
+      const devices = []
+      for (const device of this.props.records){
+        devices.push(
+          <option key={device.id} value={device.id}>{device.clientName}</option>
+        )
+      }
+      bookmark =
+        <div className="horiz-action-row">
+          <form method="post" onSubmit={this.bookmark.bind(this)}>
+            <label>Bookmark tabs from 
+              <select name="device" id ="device">
+                {devices}
+              </select>
+            </label>
+            <button type="submit"> Go </button>
+          </form>
+        </div>
+    }
+
     let reset;
     if (this.props.engine.resetClient) {
       reset =
@@ -62,6 +110,7 @@ class EngineActions extends React.Component {
     };
     return (
       <>
+      { bookmark }
       { reset }
       { wipe }
     </>
