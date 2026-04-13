@@ -21,7 +21,7 @@ try {
 }
 const { STATUS_OK, MASTER_PASSWORD_LOCKED, LOGIN_FAILED_LOGIN_REJECTED, SERVER_MAINTENANCE, LOGIN_FAILED_NETWORK_ERROR } = WeaveConstants;
 
-XPCOMUtils.defineLazyServiceGetter(this, "AlertsService", "@mozilla.org/alerts-service;1", "nsIAlertsService");
+XPCOMUtils.defineLazyServiceGetter(this, "AlertsService", "@mozilla.org/alerts-service;1", Ci.nsIAlertsService);
 
 const PREF_VERBOSE = "extensions.aboutsync.verbose";
 let verbose = false;
