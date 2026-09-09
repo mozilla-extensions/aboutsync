@@ -169,12 +169,7 @@ tasks:
                                   then:
                                       kind: cron-task
                       routes:
-                          $flatten:
-                              - checks
-                              - $if: 'tasks_for == "github-push"'
-                                then:
-                                    - "index.${trustDomain}.v2.${project}.revision.${head_sha}.taskgraph.decision"
-                                else: []
+                          - checks
                       scopes:
                           $if: 'tasks_for == "github-push"'
                           then:
