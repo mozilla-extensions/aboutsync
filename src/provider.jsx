@@ -47,7 +47,28 @@ class Provider {
 class JSONProvider extends Provider {
   constructor(url) {
     super("json");
-    this._loadPromise = fetch(url).then(resp => resp.json());
+    let parsed;
+    try {
+      parsed = new URL(url);
+    } catch (ex) {
+      throw new Error(`Invalid provider URL: ${url}`);
+    }
+    // Only allow https: URLs (or file: URLs picked via the local file
+    // picker) - anything else (eg, data:, javascript:) is rejected.
+    if (parsed.protocol != "https:" && parsed.protocol != "file:") {
+      throw new Error(`Provider URL must use https or file scheme: ${url}`);
+    }
+    this._loadPromise = fetch(parsed.href).then(resp => {
+      if (!resp.ok) {
+        throw new Error(`Failed to fetch provider data: ${resp.status}`);
+      }
+      return resp.json();
+    }).then(data => {
+      if (!data || typeof data != "object") {
+        throw new Error("Provider data is not a valid JSON object");
+      }
+      return data;
+    });
   }
 
   promiseCollectionInfo() {
