@@ -300,13 +300,15 @@ class CollectionViewer extends React.Component {
         {this.props.provider.isLocal && engine && (
           <TabPanel name="Engine Actions" key="actions">
             <EngineActions
-              engine={engine}/>
+              engine={engine} 
+              records={this.state.originalRecords}
+              />
           </TabPanel>
         )}
       </TabView>
     );
   }
-
+  
   render() {
     let body = this.state.records
              ? this.renderTabs()
