@@ -16,9 +16,14 @@ try {
 }
 
 
-const weaveService = Cc["@mozilla.org/weave/service;1"]
-                     .getService(Ci.nsISupports)
-                     .wrappedJSObject;
+let weaveService;
+try {
+  ({ WeaveService: weaveService } = ChromeUtils.importESModule("moz-src:///services/sync/Weave.sys.mjs"));
+} catch {
+  weaveService = Cc["@mozilla.org/weave/service;1"]
+                 .getService(Ci.nsISupports)
+                 .wrappedJSObject;
+}
 
 let getFxAccountsSingleton;
 try {
